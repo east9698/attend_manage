@@ -3,4 +3,8 @@ from django.http import HttpResponse
 # Create your views here.
 
 def index(request):
-    return HttpResponse('hello django')
+    params = {
+        'name_jp':'東　昭太朗',
+        'status' : True,
+        }
+    return render(request, 'console/index.html', params)

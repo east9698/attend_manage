@@ -1,0 +1,30 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>曽研入退室管理システム</title>
+  </head>
+  <body>
+    <header>
+      <h1>曽研究室　入退室管理システム</h1>
+    </header>
+    <nav>
+      <p>{{name_jp}}</p>
+      <ul>
+        <li>ホーム</li>
+        <li>全体利用状況</li>
+        <li>本日の予定</li>
+      </ul>
+    </nav>
+    <main>
+      {% if params.status == True %}
+      <p>現在、研究室に在室しています</p>
+      <button type="submit" name="not_available">退室</button>
+      {% else %}
+      <p>現在、研究室に在室していません</p>
+      <button type="submit" name="available">入室</button>
+      {% endif%}
+    </main>
+  </body>
+</html>
