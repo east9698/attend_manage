@@ -1,0 +1,24 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{title}}|曽研入退室管理システム</title>
+  </head>
+  <body>
+    <header>
+      <h1>曽研究室　入退室管理システム</h1>
+    </header>
+    <nav>
+      <p>{{name_jp}}さん</p>
+      <ul>
+        <li><a href="{% url 'index' %}">ホーム</a></li>
+        <li><a href="{% url 'status_all' %}">研究室の今</a></li>
+        <li><a href="{% url 'schedule' %}">本日の予定</a></li>
+      </ul>
+    </nav>
+    <main>
+      {% block contents %}{% endblock %}
+    </main>
+  </body>
+</html>
