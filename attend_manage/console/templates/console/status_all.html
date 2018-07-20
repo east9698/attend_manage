@@ -1,0 +1,11 @@
+{% extends "console/base.html" %}
+
+{% block contents %}
+{% if status is True %}
+<p>現在、研究室に在室しています</p>
+<button type="submit" name="not_available">退室</button>
+{% else %}
+<p>現在、研究室に在室していません</p>
+<button type="submit" name="available">入室</button>
+{% endif %}
+{% endblock %}
