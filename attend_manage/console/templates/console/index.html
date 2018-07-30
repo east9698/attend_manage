@@ -2,10 +2,13 @@
 
 {% block contents %}
 {% if status is True %}
-<p>現在、研究室に在室しています</p>
-<button type="submit" name="not_available">退室</button>
+<p>現在、研究室に <span id="status">在室しています</span> </p>
 {% else %}
-<p>現在、研究室に在室していません</p>
-<button type="submit" name="available">入室</button>
+<p>現在、研究室に <span id="status">在室していません</span> </p>
 {% endif %}
+
+<div id="switch">
+  <button type="submit" class="btn btn-md btn-success" name="enter">入室</button>
+  <button type="submit" class="btn btn-md btn-danger" name="exit" disabled>退室</button>
+</div>
 {% endblock %}

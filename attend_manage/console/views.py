@@ -10,6 +10,14 @@ def index(request):
         }
     return render(request, 'console/index.html', params)
 
+def status_change(request):
+    params = {
+        'title':'ホーム',
+        'name_jp':'東　昭太朗',
+        'status':True,
+        }
+    return render(request, 'console/index.html', params)
+
 def status_all(request):
     params = {
         'title':'研究室の今',
