@@ -1,18 +1,43 @@
 $(function(){
-
-  $("button[name='enter']").on('click', function(event){
+  $("#enter").on('click', function(event){
     event.preventDefault(); // form機能の停止
-    alert("ok");
+    alert("request processing...");
+    request_data = {
+      "user" : "higashi",
+      "status" : $(this).prop("name")
+    };
+    //console.log(JSON.stringify(data));
     $.ajax({
-      url: /status_change/,
-      method: POST,
-      data: $(this).prop("name")
-    })
-    .done(function(data){
-      data["proc_status"] ? alert("正常に入室処理されました。") : alart("サーバーでエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+      url: "status_change/",
+      method: "POST",
+      data: request_data // 連想配列をJSONに変換（データ本体）
+      //dataType: "json", // 返信データの形式
+      //timeout : "5000", // 5秒待機
+      //processData: false,
+      //contentType: false,
+      //data: {"user" : "higashi","status" : $(this).prop("name")}
 
+      /*beforeSend: function(xhr, settings) {         //リクエスト送信前の処理,CSRFTokenを設定
+         xhr.setRequestHeader("X-CSRFToken", $("input[name='csrfmiddlewaretoken']").val());
+      }*/
     })
-  })
-  var length = $("p").length;
-  console.log(length);
+    .done(function(responce, textStatus, jqXHR){
+
+      if (responce['error'] === "not_changed") {
+        alert(`既に入室しています。 (status = ${jqXHR.status})`);
+        return(0);
+      } else if ('error' in responce) {
+        alart("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+        return(1);
+      } else {
+        console.log(responce);
+        alert(`正常に処理しました。(status = ${jqXHR.status})`);
+        $("#enter").prop('disabled', true);
+        $("#exit").prop('disabled', false);
+      }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown){
+      alert(`通信エラーが発生しました。(status = ${jqXHR.status})\nもう一度試すか、管理者にご連絡ください。`);
+    });
+  });
 });

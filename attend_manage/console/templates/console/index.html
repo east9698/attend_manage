@@ -7,8 +7,9 @@
 <p>現在、研究室に <span id="status">在室していません</span> </p>
 {% endif %}
 
-<div id="switch">
-  <button type="submit" class="btn btn-md btn-success" name="enter">入室</button>
-  <button type="submit" class="btn btn-md btn-danger" name="exit" disabled>退室</button>
-</div>
+<form class="" action="{% url 'status_change' %}" method="post" id="switch">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-md btn-success" name="enter" id="enter">入室</button>
+  <button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit" disabled>退室</button>
+</form>
 {% endblock %}
