@@ -8,9 +8,9 @@ $(function(){
     };
     //console.log(JSON.stringify(data));
     $.ajax({
-      url: "status_change/",
+      url: "status_change/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
       method: "POST",
-      data: request_data // 連想配列をJSONに変換（データ本体）
+      data: request_data // 連想配列をJSONに変換しなくて良い見たい・・・
       //dataType: "json", // 返信データの形式
       //timeout : "5000", // 5秒待機
       //processData: false,
@@ -40,4 +40,37 @@ $(function(){
       alert(`通信エラーが発生しました。(status = ${jqXHR.status})\nもう一度試すか、管理者にご連絡ください。`);
     });
   });
+
+  $("#exit").on('click', function(event){
+    event.preventDefault(); // form機能の停止
+    alert("request processing...");
+    request_data = {
+      "user" : "higashi",
+      "status" : $(this).prop("name")
+    };
+    $.ajax({
+      url: "status_change/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
+      method: "POST",
+      data: request_data // 連想配列をJSONに変換しなくて良い見たい・・・
+    })
+    .done(function(responce, textStatus, jqXHR){
+
+      if (responce['error'] === "not_changed") {
+        alert(`既に退室しています。 (status = ${jqXHR.status})`);
+        return(0);
+      } else if ('error' in responce) {
+        alart("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+        return(1);
+      } else {
+        console.log(responce);
+        alert(`正常に処理しました。(status = ${jqXHR.status})`);
+        $("#enter").prop('disabled', true);
+        $("#exit").prop('disabled', false);
+      }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown){
+      alert(`通信エラーが発生しました。(status = ${jqXHR.status})\nもう一度試すか、管理者にご連絡ください。`);
+    });
+  });
+
 });

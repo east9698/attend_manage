@@ -20,7 +20,7 @@ def status_change(request):
     print(request.POST) # 送られてくるデータの中身を確認することは大切なこと！
     request_data = request.POST
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
-    if request_data['status'] == 'enter': # 本来はDBないの値を持って来ないといけない
+    if request_data['status'] == 'exit': # 本来はDBないの値を持って来ないといけない
         responce_data = {
             'error':'not_changed'
         }
