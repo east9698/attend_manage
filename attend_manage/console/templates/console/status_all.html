@@ -1,11 +1,21 @@
 {% extends "console/base.html" %}
 
 {% block contents %}
-{% if status is True %}
-<p>現在、研究室に在室しています</p>
-<button type="submit" name="not_available">退室</button>
-{% else %}
-<p>現在、研究室に在室していません</p>
-<button type="submit" name="available">入室</button>
-{% endif %}
+
+<table class="table table-borderd">
+  <thead>
+    <tr>
+      <th>名前</th>
+      <th>在室状況</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+    <tr>
+      <th>{{item.}}</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 {% endblock %}
