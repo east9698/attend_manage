@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'console'
+    'console',
 ]
 
 MIDDLEWARE = [
@@ -76,11 +76,15 @@ WSGI_APPLICATION = 'attend_manage.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'attend_manage',
+        'USER': 'shotaro',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
-
+# db.backendsをpostgresqlに変更した時は、psycopg2-binaryのインストールを忘れないこと
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -114,8 +118,19 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Authentication
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth
+
+LOGIN_REDIRECT_URL = '/' # デフォルトでは/accounts/profileにリダイレクトするらしい
+LOGOUT_REDIRECT_URL = '/login/' # デフォルトではリダイレクトしないようである
+LOGIN_URL = '/login/' # デフォルトでは/accounts/login/に飛ばされる
+# 最初に'/'を入れてあげないと意図した通りにリダイレクトできない、そのままだと例えばログアウトページで'/logout/login/'みたいなことになる
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# / が最後につかない方が好みなので
+APPEND_SLASH = True
