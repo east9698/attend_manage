@@ -3,7 +3,7 @@
 <html lang="ja" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>{{title}}|曽研入退室管理システム</title>
+    <title>{{title}}|曽研究室利用管理システム</title>
     <link rel="shortcut icon" href="{% static 'console/img/fit_jc_banner.svg' %}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -11,14 +11,18 @@
   </head>
   <body>
     <header>
-      <h1>曽研究室　入退室管理システム</h1>
+      <h1>曽研究室利用管理システム</h1>
     </header>
     <nav>
-      <p>{{name_jp}}さん</p>
+      <p>{{username}}さん</p>
       <ul>
+        <li><a href="{% url 'logout' %}">ログアウト</a></li>
         <li><a href="{% url 'index' %}">ホーム</a></li>
+        <li><a href="{% url 'status_all' %}">在室者確認</a></li>
+        {% if authenticated %}
         <li><a href="{% url 'status_all' %}">研究室の今</a></li>
-        <li><a href="{% url 'schedule' %}">本日の予定</a></li>
+        {% endif %}
+
       </ul>
     </nav>
     <main>
