@@ -3,12 +3,12 @@
 {% block contents %}
 {% if status is True %}
 <p>現在、研究室に <span id="status">在室しています</span> </p>
-<button type="submit" class="btn btn-md btn-success" name="enter" id="enter">入室</button>
-<button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit" disabled>退室</button>
+<button type="submit" class="btn btn-md btn-success" name="enter" id="enter" disabled>在室登録</button>
+<button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit">退室処理</button>
 {% elif status is False %}
 <p>現在、研究室に <span id="status">在室していません</span> </p>
-<button type="submit" class="btn btn-md btn-success" name="enter" id="enter" disabled>入室</button>
-<button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit">退室</button>
+<button type="submit" class="btn btn-md btn-success" name="enter" id="enter">在室登録</button>
+<button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit" disabled>退室処理</button>
 {% else %}
 <p><span id="status">エラーが発生しました。</span> </p>
 {% endif %}
