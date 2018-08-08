@@ -229,3 +229,4 @@ venv.bak/
 .mypy_cache/
 
 
+directory-a/db
