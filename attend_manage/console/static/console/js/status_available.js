@@ -3,7 +3,7 @@ $(function(){
     event.preventDefault(); // form機能の停止
     alert("request processing...");
     request_data = {
-      "user" : "higashi",
+      //"user" : "higashi",
       "status" : $(this).prop("name")
     };
     //console.log(JSON.stringify(data));
@@ -34,6 +34,7 @@ $(function(){
         alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', true);
         $("#exit").prop('disabled', false);
+        $("#status").html("在室しています");
       }
     })
     .fail(function(jqXHR, textStatus, errorThrown){
@@ -45,7 +46,7 @@ $(function(){
     event.preventDefault(); // form機能の停止
     alert("request processing...");
     request_data = {
-      "user" : "higashi",
+      //"user" : "higashi",
       "status" : $(this).prop("name")
     };
     $.ajax({
@@ -64,8 +65,9 @@ $(function(){
       } else {
         console.log(responce);
         alert(`正常に処理しました。(status = ${jqXHR.status})`);
-        $("#enter").prop('disabled', true);
-        $("#exit").prop('disabled', false);
+        $("#enter").prop('disabled', false);
+        $("#exit").prop('disabled', true);
+        $("#status").html("在室していません");
       }
     })
     .fail(function(jqXHR, textStatus, errorThrown){
