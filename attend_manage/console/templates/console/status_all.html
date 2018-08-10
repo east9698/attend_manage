@@ -5,14 +5,15 @@
 <table class="table table-borderd">
   <thead>
     <tr>
-      <th>名前</th>
-      <th>在室状況</th>
+      <th>氏名</th>
+      <th>入室時刻</th>
     </tr>
   </thead>
   <tbody>
-    {% for item in data %}
+    {% for i in all_stat %}
     <tr>
-      <th>{{item.}}</th>
+      <th>{{i.user.name_ja}}</th>
+      <td>{{i.time_in}}</td>
     </tr>
     {% endfor %}
   </tbody>
