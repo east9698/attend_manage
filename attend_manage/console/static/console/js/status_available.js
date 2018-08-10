@@ -2,9 +2,16 @@ $(function(){
   $("#enter").on('click', function(event){
     event.preventDefault(); // form機能の停止
     alert("request processing...");
+    status = false;
+
+    if ($(this).prop("name")=="enter") {
+      status = true;
+    }else if ($(this).prop("name")=="exit") {
+      status = false;
+    }
+
     request_data = {
-      //"user" : "higashi",
-      "status" : $(this).prop("name")
+      "status": status
     };
     //console.log(JSON.stringify(data));
     $.ajax({
@@ -45,9 +52,16 @@ $(function(){
   $("#exit").on('click', function(event){
     event.preventDefault(); // form機能の停止
     alert("request processing...");
+    status = false;
+
+    if ($(this).prop("name")=="enter") {
+      status = true;
+    }else if ($(this).prop("name")=="exit") {
+      status = false;
+    }
+
     request_data = {
-      //"user" : "higashi",
-      "status" : $(this).prop("name")
+      "status": status
     };
     $.ajax({
       url: "status_change/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。

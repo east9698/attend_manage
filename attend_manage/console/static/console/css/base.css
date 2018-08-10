@@ -1,0 +1,13 @@
+caption {
+  caption-side: top!important;
+  text-align: center!important;
+  font-size: 2rem;
+}
+
+table {
+  width: 75vw!important;
+  margin: 0 auto!important;
+}
+h1 {
+    background-color : yellow;
+}
