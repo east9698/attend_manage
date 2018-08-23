@@ -135,3 +135,16 @@ STATIC_URL = '/static/'
 
 # / が最後につかない方が好みなので
 APPEND_SLASH = True
+
+# tornado_websocketsに関する設定
+import tornado_websockets as websocket
+
+TORNADO = {
+    'port': 8000, # default
+    'handlers': [
+        websocket.django_app(),
+    ],
+    'settings': {
+        'debug': True, # 本番環境ではFalseに
+    },
+}
