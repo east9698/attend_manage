@@ -10,27 +10,37 @@ from datetime import datetime
 
 @login_required
 def index(request):
-    user = request.user.id
+    user_id = request.user.id
     #print(all_user)
-    user_prof = UserProfile.objects.filter(user=user).select_related('user').get()
+    user_prof = UserProfile.objects.filter(user=user_id).select_related('user').get()
     #query_username = UserProfile.objects.filter(user=user).values('name_ja')
     #print(username)
     #print(request.user.username)
     #type(username)
     #print(InRoom.objects.filter(user=user).values())
     #print(InRoom.objects.filter(user=user).get().available)
-    my_status = AttendanceLog.objects.filter(user=user).select_related('user').latest('time_in')
-    all_status = AttendanceLog.objects.filter(time_out__isnull=True).select_related('user').all()
     is_in_room = False
+    time_enter = None
 
-    if my_status.time_in and my_status.time_out is None:
-        is_in_room = True # つまり在室
+    if AttendanceLog.objects.filter(user=user_id).count() is 0:
+        #is_in_room = False
+        #time_enter = None
+        pass
+    else:
+        my_status = AttendanceLog.objects.filter(user=user_id).select_related('user').latest('time_in')
+
+        if my_status.time_in and my_status.time_out is None:
+            is_in_room = True # つまり在室
+            time_enter = my_status.time_in
+
+    all_status = AttendanceLog.objects.filter(time_out__isnull=True).select_related('user').all()
+
 
     params = {
         'title':'ホーム',
         'username': user_prof.name_ja, # ユーザーの日本語名を代入
         'my_stat': is_in_room, # DB上の在室状況
-        'time_in': my_status.time_in,
+        'time_in': time_enter,
         'all_stat': all_status
         }
     return render(request, 'console/index.html', params)
@@ -42,19 +52,24 @@ def status_change(request):
     #print('request_data')
     #print(request.POST) # 送られてくるデータの中身を確認することは大切なこと！
     request_data = request.POST
-    user = request.user.id
-    my_status = AttendanceLog.objects.filter(user=user).select_related('user').latest('time_in')
+    user_id = request.user.id
+    is_in_room = False
+
+    if AttendanceLog.objects.filter(user=user_id).count() is 0:
+        pass
+    else:
+        my_status = AttendanceLog.objects.filter(user=user_id).select_related('user').latest('time_in')
+
+        if my_status.time_in and my_status.time_out is None:
+            is_in_room = True # つまり在室
+            time_enter = my_status.time_in
+
     time = datetime.now().isoformat()
     #print(time)
 
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
-
-    is_in_room = False
-
-    if my_status.time_in and my_status.time_out is None:
-        is_in_room = True # つまり在室
-
     #print(in_room, request_data['status'])
+
     if request_data['status'] is is_in_room: # 本来はDBないの値を持って来ないといけない
         responce_data = {
             'error':'not_changed'
@@ -64,18 +79,18 @@ def status_change(request):
 
     # 退出時の処理（データ整合性の確認のため、条件に２つの式を指定している）
     elif is_in_room is True and request_data['status'] is not is_in_room:
-        #print(AttendanceLog.objects.filter(user=user).latest('time_in'))
-        log = AttendanceLog.objects.filter(user=user).latest('time_in')
+        #print(AttendanceLog.objects.filter(user=user_id).latest('time_in'))
+        log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
         log.time_out = time
         log.save()
-        #InRoom.objects.filter(user=user).update(available=False)
+        #InRoom.objects.filter(user=user_id).update(available=False)
 
         #time = datetime.now(timezone('Asia/Tokyo')).isoformat()
     # 入室時の処理
     elif is_in_room is False and request_data['status'] is not is_in_room:
-        log = AttendanceLog(user_id=user, time_in=time)
+        log = AttendanceLog(user_id=user_id, time_in=time)
         log.save()
-        #InRoom.objects.filter(user=user).update(available=True)
+        #InRoom.objects.filter(user=user_id).update(available=True)
 
 
     if my_status.time_in and my_status.time_out is None:
@@ -90,8 +105,8 @@ def status_change(request):
 
 @login_required
 def status_all(request):
-    user = request.user.id
-    user_prof = UserProfile.objects.filter(user=user).select_related('user').get()
+    user_id = request.user.id
+    user_prof = UserProfile.objects.filter(user=user_id).select_related('user').get()
     #data = Article.objects.select_related('UserProfile').filter(time_out__isnull=True)
     #print(data)
     data = AttendanceLog.objects.filter(time_out__isnull=True).select_related('user').all()
