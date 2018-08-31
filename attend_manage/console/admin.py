@@ -5,4 +5,3 @@ from .models import *
 
 admin.site.register(UserProfile)
 admin.site.register(AttendanceLog)
-admin.site.register(InRoom)

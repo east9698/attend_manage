@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile, AttendanceLog, InRoom
+from .models import UserProfile, AttendanceLog
 import json
 from datetime import datetime
 # Create your views here.
@@ -17,8 +17,6 @@ def index(request):
     #print(username)
     #print(request.user.username)
     #type(username)
-    #print(InRoom.objects.filter(user=user).values())
-    #print(InRoom.objects.filter(user=user).get().available)
     is_in_room = False
     time_enter = None
 
@@ -83,14 +81,12 @@ def status_change(request):
         log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
         log.time_out = time
         log.save()
-        #InRoom.objects.filter(user=user_id).update(available=False)
 
         #time = datetime.now(timezone('Asia/Tokyo')).isoformat()
     # 入室時の処理
     elif is_in_room is False and request_data['status'] is not is_in_room:
         log = AttendanceLog(user_id=user_id, time_in=time)
         log.save()
-        #InRoom.objects.filter(user=user_id).update(available=True)
 
 
     if my_status.time_in and my_status.time_out is None:
@@ -111,7 +107,6 @@ def status_all(request):
     #print(data)
     data = AttendanceLog.objects.filter(time_out__isnull=True).select_related('user').all()
     #print(data.user.name_ja)
-    #is_in_room = InRoom.objects.all().values('available')
     print(data)
     #data = [all_user, is_in_room]
     #print(data)

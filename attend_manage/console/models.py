@@ -20,13 +20,6 @@ class AttendanceLog(models.Model):
         else :
             return '%s(%s): 入室 %s / 退室 %s' % (self.user.name_ja, self.user.user.username, self.time_in.strftime("%Y-%m-%d %H:%M:%S"), self.time_out)
 
-class InRoom(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    available = models.BooleanField(default=False)
-
-    def __str__(self):
-        return '%s(%s): %s' % (self.user.name_ja, self.user.user.username, self.available)
-
 class RoomBBS(models.Model):
     auther = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
     comment = models.CharField(max_length=200)
