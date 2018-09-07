@@ -19,10 +19,11 @@ class AttendanceLog(models.Model):
             return '%s(%s): 入室 %s / 退室 %s' % (self.user.name_ja, self.user.user.username, self.time_in.strftime("%Y-%m-%d %H:%M:%S"), self.time_out.strftime("%Y-%m-%d %H:%M:%S"))
         else :
             return '%s(%s): 入室 %s / 退室 %s' % (self.user.name_ja, self.user.user.username, self.time_in.strftime("%Y-%m-%d %H:%M:%S"), self.time_out)
-
+'''
 class RoomBBS(models.Model):
     auther = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
     comment = models.CharField(max_length=200)
 
     def __str__(self):
         return '%s(%s): %s' % (self.auther.name_ja, self.auther, self.comment)
+'''
