@@ -5,126 +5,115 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile, AttendanceLog
 import json
-from datetime import datetime
+from datetime import datetime as dt
 # Create your views here.
 
 @login_required
 def index(request):
+
     user_id = request.user.id
-    #print(all_user)
     user_prof = UserProfile.objects.filter(user=user_id).select_related('user').get()
-    #query_username = UserProfile.objects.filter(user=user).values('name_ja')
-    #print(username)
-    #print(request.user.username)
-    #type(username)
+    print(user_prof)
     is_in_room = False
     time_enter = None
+    available_users = None
 
-    if AttendanceLog.objects.filter(user=user_id).count() is 0:
-        #is_in_room = False
-        #time_enter = None
-        pass
-    else:
-        my_status = AttendanceLog.objects.filter(user=user_id).select_related('user').latest('time_in')
 
-        if my_status.time_in and my_status.time_out is None:
+    # 自分のステータスが在室中かどうかの確認処理
+    if AttendanceLog.objects.filter(user=user_id).exists(): # 自分のレコードが存在するか
+
+        if AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists(): # 最も新しいレコードを取得
+
             is_in_room = True # つまり在室
-            time_enter = my_status.time_in
+            time_enter = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).select_related('user').latest('time_in')
 
-    all_status = AttendanceLog.objects.filter(time_out__isnull=True).select_related('user').all()
+        # 過去のレコードが存在しない場合は在室していないので初期値(is_in_room=False)のままクライアントに渡す
 
 
+    # 在室者一覧取得のための処理
+    if AttendanceLog.objects.exists(): # 全体でレコードが存在する場合
+
+        if AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).exists():
+
+            available_users = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user').all() # 現在の在室者一覧を取得
+
+        # 誰もいない場合は初期値(available_users=None)のままクライアントに返す
+
+    # クライアント側に返すデータ
     params = {
-        'title':'ホーム',
+        'title': 'ホーム',
         'username': user_prof.name_ja, # ユーザーの日本語名を代入
         'my_stat': is_in_room, # DB上の在室状況
         'time_in': time_enter,
-        'all_stat': all_status
-        }
+        'all_stat': available_users,
+    }
+
     return render(request, 'console/index.html', params)
+
 
 @csrf_exempt
 def status_change(request):
-    #request_json = request.POST['data'] # Ajaxリクエストとして取得したJSONデータを格納
-    #request_data = json.loads(request_json) # JSONデータを辞書型に変換
-    #print('request_data')
-    #print(request.POST) # 送られてくるデータの中身を確認することは大切なこと！
+
     request_data = request.POST
     user_id = request.user.id
-    is_in_room = False
+    is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
+    current_time = dt.now().isoformat()
 
-    if AttendanceLog.objects.filter(user=user_id).count() is 0:
-        pass
-    else:
-        my_status = AttendanceLog.objects.filter(user=user_id).select_related('user').latest('time_in')
-
-        if my_status.time_in and my_status.time_out is None:
-            is_in_room = True # つまり在室
-            time_enter = my_status.time_in
-
-    time = datetime.now().isoformat()
-    #print(time)
-
-    # DB上の在室状況とリクエストの値が同じ場合エラーを返す
-    #print(in_room, request_data['status'])
-
-    if request_data['status'] is is_in_room: # 本来はDBないの値を持って来ないといけない
-        responce_data = {
-            'error':'not_changed'
-        }
-        return JsonResponse(responce_data)
-    # 問題ない場合はリクエストされた値をDBに代入しその値を返す
 
     # 退出時の処理（データ整合性の確認のため、条件に２つの式を指定している）
-    elif is_in_room is True and request_data['status'] is not is_in_room:
-        #print(AttendanceLog.objects.filter(user=user_id).latest('time_in'))
+    if is_in_room is True and request_data['status'] is not is_in_room:
         log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
-        log.time_out = time
+        log.time_out = current_time
         log.save()
 
-        #time = datetime.now(timezone('Asia/Tokyo')).isoformat()
     # 入室時の処理
     elif is_in_room is False and request_data['status'] is not is_in_room:
-        log = AttendanceLog(user_id=user_id, time_in=time)
+        log = AttendanceLog(user_id=user_id, time_in=current_time)
         log.save()
 
+    # DB上の在室状況とリクエストの値が同じ場合エラーを返す
+    elif request_data['status'] is is_in_room:
+        responce_data = {
+            'error':'same status(no change)'
+        }
+        return JsonResponse(responce_data)
 
-    if my_status.time_in and my_status.time_out is None:
-        is_in_room = True # つまり在室
-    else:
-        is_in_room = False
 
+    # 問題ない場合はリクエストされた値をDBに代入しその値を返す
     responce_data = {
         'status': is_in_room
     }
     return JsonResponse(responce_data)
 
-@login_required
+@csrf_exempt
 def status_all(request):
-    user_id = request.user.id
-    user_prof = UserProfile.objects.filter(user=user_id).select_related('user').get()
-    #data = Article.objects.select_related('UserProfile').filter(time_out__isnull=True)
-    #print(data)
-    data = AttendanceLog.objects.filter(time_out__isnull=True).select_related('user').all()
-    #print(data.user.name_ja)
-    print(data)
-    #data = [all_user, is_in_room]
-    #print(data)
-    params = {
-        'title': '在室者一覧',
-        'username': user_prof.name_ja,
-        'data': data
-        #'all_user': all_user,
-        #'available': is_in_room
-        }
-    return render(request, 'console/status_all.html', params)
 
-'''
-def schedule(request):
-    params = {
-        'title':'本日の予定',
-        'name_jp':'東　昭太朗',
-        'status' : 1
+    request_data = request.POST
+    user_id = request.user.id
+    available_users = []
+    responce_data = {}
+
+    #if AttendanceLog.objects.exists(): # 全体でレコードが存在する場合
+
+    if AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).exists():
+
+        query = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user') # 現在の在室者一覧を取得
+
+        for i in range(query.count()):
+
+            available_users.append({'username': query[i].user.name_ja,'time_in': query[i].time_in.strftime("%Y年%m月%d日 %H:%M:%S")})
+
+    # DB上の在室状況とリクエストの値が同じ場合エラーを返す
+    else:
+        responce_data = {
+            'error': 'no record',
         }
-    return render(request, 'console/index.html', params)
-'''
+        return JsonResponse(responce_data)
+
+
+    # 問題ない場合はリクエストされた値をDBに代入しその値を返す
+    responce_data = {
+        'available_users': available_users,
+    }
+    print(responce_data)
+    return JsonResponse(responce_data)
