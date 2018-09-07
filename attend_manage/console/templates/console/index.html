@@ -1,34 +1,30 @@
 {% extends "console/base.html" %}
+{%load static%}
+
+{%block extra-css %}
+<link rel="stylesheet" href="{% static 'console/css/index.css' %}">
+{% endblock %}
 
 {% block contents %}
-{% if my_stat is True %}
-<p>現在、研究室に <span id="status">在室しています</span> </p>
-<button type="submit" class="btn btn-md btn-success" name="enter" id="enter" disabled>在室登録</button>
-<button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit">退室処理</button>
-{% elif my_stat is False %}
-<p>現在、研究室に <span id="status">在室していません</span> </p>
-<button type="submit" class="btn btn-md btn-success" name="enter" id="enter">在室登録</button>
-<button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit" disabled>退室処理</button>
-{% else %}
-<p><span id="status">エラーが発生しました。</span> </p>
-{% endif %}
 
-<table class="table table-borderd">
-  <caption>在室者一覧</caption>
-  <thead>
-    <tr>
-      <th>氏名</th>
-      <th>入室時刻</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for i in all_stat %}
-    <tr>
-      <th>{{i.user.name_ja}}</th>
-      <td>{{i.time_in}}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<section id="available_users_list">
+  <table class="table table-borderd">
+    <caption>在室者一覧<i class="fas fa-sync-alt ml-3 result"></i></caption>
+    <thead>
+      <tr>
+        <th>氏名</th>
+        <th>入室時刻</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in all_stat %}
+      <tr>
+        <th>{{i.user.name_ja}}</th>
+        <td>{{i.time_in}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
 
 {% endblock %}

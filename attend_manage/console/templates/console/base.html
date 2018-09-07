@@ -3,23 +3,52 @@
 <html lang="ja" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
     <title>{{title}}|曽研究室利用管理システム</title>
     <link rel="shortcut icon" href="{% static 'console/img/fit_jc_banner.svg' %}">
     <link rel="stylesheet" href="{% static 'console/css/base.css' %}">
+    {% block extra-css %}{% endblock %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="{% static 'console/js/status_available.js' %}"></script>
+    <script type="text/javascript" src="{% static 'console/js/available_users.js' %}"></script>
   </head>
   <body>
     <header>
-      <h1>曽研究室利用管理システム</h1>
+      <div class="container-fluid">
+        <div class="row justify-content-between my-1">
+          <div class="col-sm-7 col-md-6 col-lg-5">
+            <span id="title">曽研究室利用管理システム</span>
+          </div>
+          <div class="col-sm-4 col-md-4 col-lg-3 text-right mt-2">
+            <span id="username">{{username}}</span>
+            <a href="{% url 'logout' %}" class=""><button type="button" class="btn btn-primary btn-sm my-1">ログアウト</button></a>
+          </div>
+        </div>
+      </div>
     </header>
-    <nav>
-      <p>{{username}}さん</p>
-      <ul>
-        <li><a href="{% url 'logout' %}">ログアウト</a></li>
-      </ul>
-    </nav>
+      <nav class="my-5">
+        {% if my_stat is True %}
+        <p class="text-center">現在、研究室に<span id="status" class="text-bold">&nbsp;在室&nbsp;</span>しています</p>
+        <div class="text-center">
+          <div class="btn-group" role="group">
+            <button type="submit" class="btn btn-md btn-success" name="enter" id="enter" disabled>在室登録</button>
+            <button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit">退室処理</button>
+          </div>
+        </div>
+        {% elif my_stat is False %}
+        <p class="text-center">現在、研究室を<span id="status">&nbsp;不在&nbsp;</span>にしています</p>
+        <div class="text-center">
+          <div class="btn-group mx-auto" role="group">
+            <button type="submit" class="btn btn-md btn-success" name="enter" id="enter">在室登録</button>
+            <button type="submit" class="btn btn-md btn-danger" name="exit" id="exit" disabled>退室処理</button>
+          </div>
+        </div>
+        {% else %}
+        <p><span id="status">エラーが発生しました。</span> </p>
+        {% endif %}
+      </nav>
     <main>
       {% block contents %}{% endblock %}
     </main>

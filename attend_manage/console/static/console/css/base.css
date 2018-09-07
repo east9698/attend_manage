@@ -1,13 +1,36 @@
-caption {
-  caption-side: top!important;
-  text-align: center!important;
-  font-size: 2rem;
+:root {
+  font-size: 16px;
+}
+* {
+  margin: 0;
+  padding: 0;
 }
 
 table {
   width: 75vw!important;
   margin: 0 auto!important;
 }
-h1 {
-    background-color : yellow;
+header {
+  color: grey!important;
+  background-color:rgba(82, 224, 184, 0.5);
+  vertical-align: middle;
+}
+
+
+header span#title {
+  font-size: 1.8rem;
+
+}
+header span#username {
+  font-size: 1.2rem;
+  border-bottom: 1px grey solid;
+}
+@media (max-width: 500px) {
+  header span#title {
+    font-size: calc(70vmin/12);
+    max-width: calc(1.5rem*12);
+  }
+  header span#username {
+    font-size: 1rem;
+  }
 }
