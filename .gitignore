@@ -229,3 +229,5 @@ venv.bak/
 .mypy_cache/
 
 
+/attend_manage/db/
+settings.py
