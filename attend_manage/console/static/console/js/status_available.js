@@ -41,7 +41,7 @@ $(function(){
         alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', true);
         $("#exit").prop('disabled', false);
-        $("#status").html("在室しています");
+        $("#status").html("在室");
       }
     })
     .fail(function(jqXHR, textStatus, errorThrown){
@@ -81,7 +81,7 @@ $(function(){
         alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', false);
         $("#exit").prop('disabled', true);
-        $("#status").html("在室していません");
+        $("#status").html("不在");
       }
     })
     .fail(function(jqXHR, textStatus, errorThrown){
