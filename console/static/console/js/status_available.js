@@ -122,6 +122,7 @@ $(function(){
         $("#enter").prop('disabled', false);
         $("#exit").prop('disabled', true);
         $("#status").html("未入室");
+        sleep(2000);
         $.ajax({
           url: "status_all/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
           method: "POST",
