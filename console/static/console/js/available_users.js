@@ -28,7 +28,7 @@ $(function(){
 
         //alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
         $(innner_table).empty();
-        return(0);
+        //return(0);
 
       } else {
 

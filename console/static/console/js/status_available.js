@@ -77,8 +77,9 @@ $(function(){
 
       if (responce['error'] === "not_changed") {
         alert(`既に退室しています。 (status = ${jqXHR.status})`);
-        return(0);
+        //return(0);
       } else if ('error' in responce) {
+        alert("no one in room");
         $(innner_table).empty();
 
       } else {
@@ -87,6 +88,7 @@ $(function(){
         $("#enter").prop('disabled', false);
         $("#exit").prop('disabled', true);
         $("#status").html("未入室");
+        alert("更新するよ！");
         $("#available_users_list").trigger('click');
       }
     })
