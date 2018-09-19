@@ -10,6 +10,7 @@ $(function(){
     $.ajax({
       url: "status_all/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
       method: "POST",
+      cache: false
       //data: request_data // 連想配列をJSONに変換しなくて良い見たい・・・
       //dataType: "json", // 返信データの形式
       //timeout : "5000", // 5秒待機
