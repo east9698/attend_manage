@@ -101,7 +101,7 @@ def status_all(request):
 
         for i in range(query.count()):
 
-            available_users.append({'username': query[i].user.name_ja,'time_in': query[i].time_in.strftime("%Y年%m月%d日 %H:%M:%S")})
+            available_users.append({'username': query[i].user.name_ja,'time_in': datetime.localtime(query[i].time_in).strftime("%Y年%m月%d日 %H:%M:%S")})
 
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
     else:
