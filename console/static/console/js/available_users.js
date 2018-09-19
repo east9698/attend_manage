@@ -23,6 +23,7 @@ $(function(){
       }*/
     })
     .done(function(responce, textStatus, jqXHR){
+      var innner_table = "#available_users_list > table > tbody";
 
       if ('error' in responce) {
 
@@ -37,7 +38,6 @@ $(function(){
         console.log(responce.available_users[0].username);
         //alert(responce["available_users"][0]["username"]);
 
-        var innner_table = "#available_users_list > table > tbody";
         $(innner_table).empty();
         for (var i = 0; i < responce.available_users.length; i++) {
           var username = responce.available_users[i].username;
