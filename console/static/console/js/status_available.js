@@ -44,7 +44,7 @@ $(function(){
         $("#exit").prop('disabled', false);
         $("#status").html("入室済み");
       	alert("kkkkkkNNNNNN");
-      	$("#available_users_list").trigger("click");
+        $("#available_users_list .result").trigger("click");
 
       }
     })
@@ -89,7 +89,7 @@ $(function(){
         $("#exit").prop('disabled', true);
         $("#status").html("未入室");
         alert("更新するよ！");
-        $("#available_users_list").trigger('click');
+        $("#available_users_list .result").trigger('click');
       }
     })
     .fail(function(jqXHR, textStatus, errorThrown){
