@@ -30,7 +30,7 @@
     </header>
       <nav class="my-5">
         {% if my_stat is True %}
-        <p class="text-center">現在、研究室に<span id="status" class="text-bold">&nbsp;在室&nbsp;</span>しています</p>
+        <p class="text-center text-bold">入室済み</p>
         <div class="text-center">
           <div class="btn-group" role="group">
             <button type="submit" class="btn btn-md btn-success" name="enter" id="enter" disabled>在室登録</button>
@@ -38,7 +38,7 @@
           </div>
         </div>
         {% elif my_stat is False %}
-        <p class="text-center">現在、研究室を<span id="status">&nbsp;不在&nbsp;</span>にしています</p>
+        <p class="text-center text-bold">未入室</p>
         <div class="text-center">
           <div class="btn-group mx-auto" role="group">
             <button type="submit" class="btn btn-md btn-success" name="enter" id="enter">在室登録</button>

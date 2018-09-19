@@ -41,7 +41,7 @@ $(function(){
         alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', true);
         $("#exit").prop('disabled', false);
-        $("#status").html("在室");
+        $("#status").html("入室済み");
         $.ajax({
           url: "status_all/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
           method: "POST",
@@ -122,7 +122,7 @@ $(function(){
         alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', false);
         $("#exit").prop('disabled', true);
-        $("#status").html("不在");
+        $("#status").html("未入室");
       }
     })
     .fail(function(jqXHR, textStatus, errorThrown){
