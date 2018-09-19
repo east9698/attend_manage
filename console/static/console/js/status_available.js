@@ -34,7 +34,7 @@ $(function(){
         alert(`既に入室しています。 (status = ${jqXHR.status})`);
         return(0);
       } else if ('error' in responce) {
-        alart("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+        alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
         return(1);
       } else {
         console.log(responce);
@@ -42,7 +42,19 @@ $(function(){
         $("#enter").prop('disabled', true);
         $("#exit").prop('disabled', false);
         $("#status").html("入室済み");
-        $.ajax({
+	alert("kkkkkkNNNNNN");
+	$("#available_users_list").trigger("click");
+
+      }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown){
+      alert(`通信エラーが発生しました。(status = ${jqXHR.status})\nもう一度試すか、管理者にご連絡ください。`);
+    });
+  });
+
+  $("#available_users_list").on('click', function(event){
+    alert("kkkkkk");
+    $.ajax({
           url: "status_all/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
           method: "POST",
           //data: request_data // 連想配列をJSONに変換しなくて良い見たい・・・
@@ -59,7 +71,7 @@ $(function(){
         .done(function(responce, textStatus, jqXHR){
 
           if ('error' in responce) {
-            //alart("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+	    //alart("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
             $(innner_table).empty();
           } else {
 
@@ -80,11 +92,6 @@ $(function(){
         .fail(function(jqXHR, textStatus, errorThrown){
           alert(`通信エラーが発生しました。(status = ${jqXHR.status})\nもう一度試すか、管理者にご連絡ください。`);
         });
-      }
-    })
-    .fail(function(jqXHR, textStatus, errorThrown){
-      alert(`通信エラーが発生しました。(status = ${jqXHR.status})\nもう一度試すか、管理者にご連絡ください。`);
-    });
   });
 
   $("#exit").on('click', function(event){
@@ -137,7 +144,7 @@ $(function(){
         .done(function(responce, textStatus, jqXHR){
 
           if ('error' in responce) {
-
+	    alert("errorrrrrr");
             //alart("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
             $(innner_table).empty();
           } else {
