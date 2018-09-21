@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile, AttendanceLog
 import json
-from datetime import datetime as dt
+from datetime import datetime, timedelta
+
 # Create your views here.
 
 @login_required
@@ -57,7 +58,7 @@ def status_change(request):
     request_data = request.POST
     user_id = request.user.id
     is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
-    current_time = dt.now().isoformat()
+    current_time = datetime.now().isoformat()
 
 
     # 退出時の処理（データ整合性の確認のため、条件に２つの式を指定している）
@@ -92,7 +93,8 @@ def status_all(request):
     user_id = request.user.id
     available_users = []
     responce_data = {}
-
+    jst = timedelta(hours=9)
+    
     #if AttendanceLog.objects.exists(): # 全体でレコードが存在する場合
 
     if AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).exists():
@@ -100,8 +102,8 @@ def status_all(request):
         query = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user') # 現在の在室者一覧を取得
 
         for i in range(query.count()):
-
-            available_users.append({'username': query[i].user.name_ja,'time_in': datetime.localtime(query[i].time_in).strftime("%Y年%m月%d日 %H:%M:%S")})
+            print(query[i].time_in)
+            available_users.append({'username': query[i].user.name_ja,'time_in': (query[i].time_in + jst).strftime("%Y年%m月%d日 %H:%M:%S")})
 
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
     else:
