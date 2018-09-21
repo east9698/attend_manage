@@ -1,7 +1,7 @@
 $(function(){
   $("#available_users_list .result").on('click', function(event){
     event.preventDefault(); // form機能の停止
-    alert("request processing...");
+    //alert("request processing...");
 
     /*request_data = {
       "status": status
@@ -33,7 +33,8 @@ $(function(){
 
       } else {
 
-        alert(`正常に処理しました。(status = ${jqXHR.status})`);
+
+        //alert(`正常に処理しました。(status = ${jqXHR.status})`);
 
         console.log(responce.available_users[0].username);
         //alert(responce["available_users"][0]["username"]);

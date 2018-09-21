@@ -1,7 +1,7 @@
 $(function(){
   $("#enter").on('click', function(event){
     event.preventDefault(); // form機能の停止
-    alert("request processing...");
+    //alert("request processing...");
     status = false;
 
     if ($(this).prop("name")=="enter") {
@@ -39,11 +39,11 @@ $(function(){
         return(1);
       } else {
         console.log(responce);
-        alert(`正常に処理しました。(status = ${jqXHR.status})`);
+        //alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', true);
         $("#exit").prop('disabled', false);
         $("#status").html("入室済み");
-      	alert("kkkkkkNNNNNN");
+      	//alert("kkkkkkNNNNNN");
         $("#available_users_list .result").trigger("click");
 
       }
@@ -56,7 +56,7 @@ $(function(){
 
   $("#exit").on('click', function(event){
     event.preventDefault(); // form機能の停止
-    alert("request processing...");
+    //alert("request processing...");
     status = false;
 
     if ($(this).prop("name")=="enter") {
@@ -84,11 +84,11 @@ $(function(){
 
       } else {
         console.log(responce);
-        alert(`正常に処理しました。(status = ${jqXHR.status})`);
+        //alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', false);
         $("#exit").prop('disabled', true);
         $("#status").html("未入室");
-        alert("更新するよ！");
+        //alert("更新するよ！");
         $("#available_users_list .result").trigger('click');
       }
     })
