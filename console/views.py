@@ -102,9 +102,13 @@ def status_all(request):
         query = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user') # 現在の在室者一覧を取得
 
         for i in range(query.count()):
-            print(query[i].time_in)
-            available_users.append({'username': query[i].user.name_ja,'time_in': (query[i].time_in + jst).strftime("%Y年%m月%d日 %H:%M:%S")})
-
+            time_in = (query[i].time_in + jst).strftime("%Y年%m月%d日")
+            weekday_n = int((query[i].time_in + jst).strftime("%w"))
+            weekday_s = ["日", "月", "火", "水", "木", "金", "土"]
+            time_in += "(" + weekday_s[weekday_n] + ") "
+            time_in += (query[i].time_in + jst).strftime("%X")
+            available_users.append({'username': query[i].user.name_ja,'time_in': time_in}) 
+            
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
     else:
         responce_data = {
