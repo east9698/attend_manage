@@ -123,3 +123,19 @@ def status_all(request):
     }
     print(responce_data)
     return JsonResponse(responce_data)
+
+
+@csrf_exempt
+def radius(request):
+
+    request_data = request.POST
+    user_id = request_data['username']
+    is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
+    current_time = datetime.now().isoformat()
+
+    # 入室時の処理（データ整合性の確認のため、条件に２つの式を指定している）
+    if is_in_room is False:
+        log = AttendanceLog(user_id=user_id, time_in=current_time)
+        log.save()
+
+    return None
