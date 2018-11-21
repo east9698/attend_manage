@@ -232,3 +232,5 @@ venv.bak/
 /attend_manage/db/
 settings.py
 static/
+
+/migrations/
