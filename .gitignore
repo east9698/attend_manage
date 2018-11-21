@@ -233,4 +233,4 @@ venv.bak/
 settings.py
 static/
 
-/migrations/
+migrations/
