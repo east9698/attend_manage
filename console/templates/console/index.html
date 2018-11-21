@@ -1,9 +1,20 @@
 {% extends "console/base.html" %}
 {%load static%}
 
-{%block extra-css %}
+{%block extra-css-custom %}
 <link rel="stylesheet" href="{% static 'console/css/index.css' %}">
 {% endblock %}
+
+
+{% block extra-js-library %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- for plotly -->
+{% endblock %}
+
+
+{% block extra-js-custom %}
+<script type="text/javascript" src="{% static 'console/js/history.js' %}"></script>
+{% endblock %}
+
 
 {% block contents %}
 
@@ -25,6 +36,15 @@
       {% endfor %}
     </tbody>
   </table>
+</section>
+
+{% endblock %}
+
+
+{% block graphs %}
+
+<section id="history">
+  <div id="graph_duration"></div>
 </section>
 
 {% endblock %}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime, timedelta
 # Create your models here.
 
 class UserProfile(models.Model):
@@ -15,11 +16,7 @@ class AttendanceLog(models.Model):
     time_out = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        
-        weekday_n = int((query[i].time_in + jst).strftime("%w"))
-        weekday_s = ["日", "月", "火", "水", "木", "金", "土"]
-        weekday_ja = weekday_s[weekday_n]
-        time_in += (query[i].time_in + jst).strftime("%X")
+
         if self.time_out:
             return '%s(%s): 入室 %s / 退室 %s' % (self.user.name_ja, self.user.user.username, self.time_in.strftime("%Y-%m-%d(%a) %H:%M:%S"), self.time_out.strftime("%Y-%m-%d %H:%M:%S"))
         else :
