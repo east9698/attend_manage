@@ -239,4 +239,4 @@ migrations/### https://raw.github.com/github/gitignore/1fb9ea045e619c61e22337153
 
 
 ### original
-migrations/*
+*/migrations/*
