@@ -6,8 +6,18 @@ from django.contrib.auth.decorators import login_required
 from .models import UserProfile, AttendanceLog
 import json
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 # Create your views here.
+
+# translate to japanese format for time objects
+def date_fmt_ja(obj):
+    date_ja = obj.strftime("%Y年%m月%d日")
+    weekday_n = int((obj).strftime("%w"))
+    weekday_s = ["日", "月", "火", "水", "木", "金", "土"]
+    date_ja += "(" + weekday_s[weekday_n] + ") "
+    date_ja += (obj).strftime("%X")
+    return date_ja
 
 @login_required
 def index(request):
@@ -17,7 +27,7 @@ def index(request):
     print(user_prof)
     is_in_room = False
     time_enter = None
-    available_users = None
+    available_users = []
 
 
     # 自分のステータスが在室中かどうかの確認処理
@@ -36,7 +46,11 @@ def index(request):
 
         if AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).exists():
 
-            available_users = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user').all() # 現在の在室者一覧を取得
+            query = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user').all() # 現在の在室者一覧を取得
+
+            for i in range(query.count()):
+                time_in = date_fmt_ja(query[i].time_in)
+                available_users.append({'username': query[i].user.name_ja, 'time_in': time_in})
 
         # 誰もいない場合は初期値(available_users=None)のままクライアントに返す
 
@@ -58,7 +72,7 @@ def status_change(request):
     request_data = request.POST
     user_id = request.user.id
     is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
-    current_time = datetime.now().isoformat()
+    current_time = timezone.now()
 
 
     # 退出時の処理（データ整合性の確認のため、条件に２つの式を指定している）
@@ -90,11 +104,9 @@ def status_change(request):
 def status_all(request):
 
     request_data = request.POST
-    user_id = request.user.id
     available_users = []
     responce_data = {}
-    jst = timedelta(hours=9)
-    
+
     #if AttendanceLog.objects.exists(): # 全体でレコードが存在する場合
 
     if AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).exists():
@@ -102,13 +114,10 @@ def status_all(request):
         query = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user') # 現在の在室者一覧を取得
 
         for i in range(query.count()):
-            time_in = (query[i].time_in + jst).strftime("%Y年%m月%d日")
-            weekday_n = int((query[i].time_in + jst).strftime("%w"))
-            weekday_s = ["日", "月", "火", "水", "木", "金", "土"]
-            time_in += "(" + weekday_s[weekday_n] + ") "
-            time_in += (query[i].time_in + jst).strftime("%X")
-            available_users.append({'username': query[i].user.name_ja,'time_in': time_in}) 
-            
+            time_in = date_fmt_ja(query[i].time_in)
+            available_users.append({'username': query[i].user.name_ja, 'time_in': time_in})
+
+
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
     else:
         responce_data = {
@@ -131,7 +140,7 @@ def radius(request):
     request_data = request.POST
     user_id = request_data['username']
     is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
-    current_time = datetime.now().isoformat()
+    current_time = timezone.now()
 
     # 入室時の処理（データ整合性の確認のため、条件に２つの式を指定している）
     if is_in_room is False:
