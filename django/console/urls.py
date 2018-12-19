@@ -7,5 +7,6 @@ urlpatterns = [
     path('status_all/', views.status_all, name='status_all'),
     #path('schedule/', views.schedule, name='schedule'),
     path('radius/', views.radius, name='radius'),
+    path('syslog/', views.syslog, name='syslog'),
 
 ]

@@ -23,6 +23,15 @@ class AttendanceLog(models.Model):
             return '%s(%s): 入室 %s / 退室 %s' % (self.user.name_ja, self.user.user.username, date_fmt_ja(self.time_in), date_fmt_ja(self.time_out))
         else :
             return '%s(%s): 入室 %s / 退室 %s' % (self.user.name_ja, self.user.user.username, date_fmt_ja(self.time_in), self.time_out)
+
+class ActiveDevice(models.Model):
+    
+    user = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
+    device = models.TextField(name="mac_addr")
+
+    def __str__(self):
+        return '%s(%s): %s' % (self.user.name_ja, self.user.user.username, self.device)
+
 '''
 class RoomBBS(models.Model):
     auther = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
