@@ -31,20 +31,28 @@ $(function(){
     })
     .done(function(responce, textStatus, jqXHR){
 
-      if (responce['error'] === "not_changed") {
-        alert(`既に入室しています。 (status = ${jqXHR.status})`);
-        return(0);
-      } else if ('error' in responce) {
-        alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
-        return(1);
-      } else {
+      if (responce['status'] === true) {
+
+        alert(responce['smg']+` (status = ${jqXHR.status})`); // for debug
+        
         console.log(responce);
-        //alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', true);
         $("#exit").prop('disabled', false);
         $("#status").html("入室済み");
       	//alert("kkkkkkNNNNNN");
         $("#available_users_list .result").trigger("click");
+
+        return(0);
+
+      } else if (responce['status'] === false) {
+
+        alert(responce['smg']+` (status = ${jqXHR.status})`);
+        return(0);
+
+      } else {
+
+        alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+        return(1);
 
       }
     })

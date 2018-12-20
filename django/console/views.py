@@ -3,10 +3,11 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile, AttendanceLog
+from models import UserProfile, AttendanceLog, ActiveDevice
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
+#from django.core.exceptions import ObjectDoesNotExist # for exception processing
 
 # Create your views here.
 
@@ -67,38 +68,61 @@ def index(request):
 
 
 @csrf_exempt
-def status_change(request):
+def request_from_browser(request):
+    
+    request_data = request.POST
+    status_room = request_data.status
+    user_id = request.user.id
+
+    result = status_change(user_id, status_room)
+
+    return JsonResponse(result)
+
+@csrf_exempt
+def request_from_log(request):
 
     request_data = request.POST
-    user_id = request.user.id
-    is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
+    status_connect = request_data.status # this variable should take a value either "connect", "disconnect" gior "outrange"
+    username = request_data.user
+
+    if UserProfile.objects.filter(user=username).exists():
+        user_id = UserProfile.objects.filter(user=username).get(id)
+    
+    else:
+        pass # create new user on Django App
+
+    status_change(user_id, status_room)
+
+def status_change(user_id, request_status): # user_id must be "int" type value, and request_status should be "bool" type value(True->Entering, False->Leaving)
+
     current_time = timezone.now()
+    is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
 
+    if request_status and not is_in_room: # Entering the room
+        log = AttendanceLog(user_id=user_id, time_in=current_time)
+        log.save()
 
-    # 退出時の処理（データ整合性の確認のため、条件に２つの式を指定している）
-    if is_in_room is True and request_data['status'] is not is_in_room:
+    elif not request_status and is_in_room: # Leaving the room
         log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
         log.time_out = current_time
         log.save()
 
-    # 入室時の処理
-    elif is_in_room is False and request_data['status'] is not is_in_room:
-        log = AttendanceLog(user_id=user_id, time_in=current_time)
-        log.save()
-
-    # DB上の在室状況とリクエストの値が同じ場合エラーを返す
-    elif request_data['status'] is is_in_room:
+    
+    else: # Return error message
         responce_data = {
-            'error':'same status(no change)'
+            'status_proc': False, # False means process status is failed 
+            'msg': 'The room status have not changed!',
         }
-        return JsonResponse(responce_data)
+        return responce_data
 
 
-    # 問題ない場合はリクエストされた値をDBに代入しその値を返す
+    # Return success message
     responce_data = {
-        'status': is_in_room
+        'status_proc': True,
+        'msg': 'The room status have successfully changed!'
     }
-    return JsonResponse(responce_data)
+    return responce_data
+
 
 @csrf_exempt
 def status_all(request):
@@ -135,16 +159,28 @@ def status_all(request):
 
 
 @csrf_exempt
-def radius(request):
+def syslog(request):
 
     request_data = request.POST
     user_id = request_data['username']
-    is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
+    is_in_room = AttendanceLog.objects.filter(user=user_id).exists()
+    is_first_time = ActiveDevice.objects.filter(user=user_id).exists()
     current_time = timezone.now()
 
     # 入室時の処理（データ整合性の確認のため、条件に２つの式を指定している）
-    if is_in_room is False:
-        log = AttendanceLog(user_id=user_id, time_in=current_time)
-        log.save()
+
+    if request_data.status is 'connect':
+        if is_first_time:
+            device = ActiveDevice(user=user_id, device=request_data.mac_addr)
+            device.save()
+            if not is_in_room:
+
+
+            query = ActiveDevice.objects.filter(user=user_id).select_related('user')
+            mac_addr_list = [x.strip() for x in query.device.split(",")]
+            for addr in mac_addr_list:
+                if addr == request_data.mac_addr:
+                    pass
+        else:
 
     return None
