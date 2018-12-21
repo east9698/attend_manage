@@ -3,7 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from models import UserProfile, AttendanceLog, ActiveDevice
+from .models import UserProfile, AttendanceLog, ActiveDevice
+from authentication.models import User
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -82,6 +83,7 @@ def request_from_browser(request):
 def request_from_log(request):
 
     request_data = request.POST
+    request_device = request_data.mac_addr
     status_connect = request_data.status # this variable should take a value either "connect", "disconnect" gior "outrange"
     username = request_data.user
 
@@ -91,7 +93,8 @@ def request_from_log(request):
     else:
         pass # create new user on Django App
 
-    status_change(user_id, status_room)
+    status_change(user_id, status_connect)
+    register_device(user_id, status_connect)
 
 def status_change(user_id, request_status): # user_id must be "int" type value, and request_status should be "bool" type value(True->Entering, False->Leaving)
 
@@ -127,7 +130,7 @@ def status_change(user_id, request_status): # user_id must be "int" type value, 
 @csrf_exempt
 def status_all(request):
 
-    request_data = request.POST
+    #request_data = request.POST
     available_users = []
     responce_data = {}
 
@@ -158,29 +161,48 @@ def status_all(request):
     return JsonResponse(responce_data)
 
 
-@csrf_exempt
-def syslog(request):
+def register_device(user_id, request_status, request_device):
 
-    request_data = request.POST
-    user_id = request_data['username']
-    is_in_room = AttendanceLog.objects.filter(user=user_id).exists()
-    is_first_time = ActiveDevice.objects.filter(user=user_id).exists()
-    current_time = timezone.now()
+    is_registerd = UserProfile.objects.filter(user=user_id).exists()
+    is_first_time = ActiveDevice.objects.filter(user=user_id).exists() # ユーザー作成時に自動生成するようにすれば不要になる
 
-    # 入室時の処理（データ整合性の確認のため、条件に２つの式を指定している）
+    # process for connect association
 
-    if request_data.status is 'connect':
-        if is_first_time:
-            device = ActiveDevice(user=user_id, device=request_data.mac_addr)
-            device.save()
-            if not is_in_room:
+    if not is_first_time and request_status:
+
+        record = ActiveDevice.objects.filter(user=user_id)
+        mac_addr_list = set([addr.strip() for addr in record.device.split(",")])
+
+        if not(set(request_device) <= mac_addr_list):
+
+            mac_addr_list.add(request_device)
+
+        result_str = ",".join(mac_addr_list)
+        record.device = result_str
+        record.save()
+
+    # ユーザー作成時に自動生成するようにすれば不要になる
+    elif is_registerd and is_first_time and request_status :
+
+        record = ActiveDevice(user=user_id, device=request_device)
+        record.save()
+
+    elif not is_registerd and request_status:
+
+        account = User(username=user_id)
+        account.save()
 
 
-            query = ActiveDevice.objects.filter(user=user_id).select_related('user')
-            mac_addr_list = [x.strip() for x in query.device.split(",")]
-            for addr in mac_addr_list:
-                if addr == request_data.mac_addr:
-                    pass
-        else:
+    # process for disconnection
+    elif not request_status and not is_first_time:
 
-    return None
+        record = ActiveDevice.objects.filter(user=user_id)
+        mac_addr_list = set([addr.strip() for addr in record.device.split(",")])
+
+        if (set(request_device) <= mac_addr_list):
+
+            mac_addr_list.remove(request_device)
+
+        result_str = ",".join(mac_addr_list)
+        record.device = result_str
+        record.save()
