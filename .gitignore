@@ -258,4 +258,4 @@ dmypy.json
 ### Original added by Shotaro Higashi
 # Django
 /django/static/
-*/migrations/*
+/django/*/migrations/*
