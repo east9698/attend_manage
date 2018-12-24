@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from distutils.util import strtobool
+from authentication.forms import *
 
 # translate to japanese format for time objects
 def date_fmt_ja(obj):
@@ -31,6 +32,10 @@ def index(request):
     is_in_room = False
     time_enter = None
     available_users = []
+
+    if not user_prof.is_active():
+
+        pass
 
 
     # 自分のステータスが在室中かどうかの確認処理
@@ -69,6 +74,10 @@ def index(request):
     return render(request, 'status_room/index.html', params)
 
 
+class UserCreationView():
+
+    form = UserCreationForm
+
 @csrf_exempt
 def request_from_browser(request):
     
@@ -90,21 +99,25 @@ def request_from_log(request):
     usermodel = get_user_model()
     request_data = request.POST
     request_device = request_data['mac_addr']
-    status_connect = request_data['status'] # this variable should take a value either "connect", "disconnect" gior "outrange"
-    user = request_data['username']
+    status_connect = bool(strtobool(request_data['status'])) # this variable should take a value either "connect", "disconnect" gior "outrange"
+    
+    try:
+        user = request_data['username']
 
-    if not usermodel.objects.filter(username=user).exists(): # create new user on Django App
-        
-        account = usermodel(username=user, password=None)
-        account.is_active = False
-        account.save()
+        if not usermodel.objects.filter(username=user).exists(): # create new user on Django App
+            
+            account = usermodel(username=user, password=None)
+            account.is_active = False
+            account.save()
 
-        device = ActiveDevice(user=user, device=None)
-        device.save()
+            device = ActiveDevice(user=user, device=None)
+            device.save()
+    except:
+        pass
 
+    register_device(user, status_connect, request_device)
 
     status_change(user, status_connect)
-    register_device(user, status_connect, request_device)
 
 
 def status_change(username, request_status): # user_id must be "int" type value, and request_status should be "bool" type value(True->Entering, False->Leaving)
