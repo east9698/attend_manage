@@ -7,7 +7,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import AttendanceLog, ActiveDevice
-from authentication.models import User
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -83,30 +82,35 @@ def request_from_browser(request):
     result = status_change(userobj, status_room)
 
     return JsonResponse(result)
-'''
+
+
 @csrf_exempt
 def request_from_log(request):
 
     usermodel = get_user_model()
     request_data = request.POST
-    request_device = request_data.mac_addr
-    status_connect = request_data.status # this variable should take a value either "connect", "disconnect" gior "outrange"
-    username = request_data.user
+    request_device = request_data['mac_addr']
+    status_connect = request_data['status'] # this variable should take a value either "connect", "disconnect" gior "outrange"
+    user = request_data['username']
 
-    if usermodel.objects.filter(user=username).exists():
-        user_id = usermodel.objects.filter(user=username).get(id)
-    
-    else:
-        pass # create new user on Django App
+    if not usermodel.objects.filter(username=user).exists(): # create new user on Django App
+        
+        account = usermodel(username=user, password=None)
+        account.is_active = False
+        account.save()
 
-    status_change(user_id, status_connect)
-    register_device(user_id, status_connect)
-'''
+        device = ActiveDevice(user=user, device=None)
+        device.save()
+
+
+    status_change(user, status_connect)
+    register_device(user, status_connect, request_device)
+
 
 def status_change(username, request_status): # user_id must be "int" type value, and request_status should be "bool" type value(True->Entering, False->Leaving)
 
     current_time = timezone.now()
-    is_in_room = AttendanceLog.objects.filter(user=username, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
+    is_in_room = AttendanceLog.objects.filter(user=username, time_in__isnull=False, time_out__isnull=True).exists()
 
     if request_status and not is_in_room: # Entering the room
         log = AttendanceLog(user=username, time_in=current_time)
@@ -171,51 +175,39 @@ def status_all(request):
     print(responce_data)
     return JsonResponse(responce_data)
 
-'''
+
 def register_device(username, request_status, request_device):
 
-    usermodel = get_user_model()
-    is_registerd = usermodel.objects.filter(user=username).exists()
-    is_first_time = ActiveDevice.objects.filter(user=username).exists() # ユーザー作成時に自動生成するようにすれば不要になる
+    #usermodel = get_user_model()
+    #is_registerd = usermodel.objects.filter(user=username).exists()
+    #is_first_time = ActiveDevice.objects.filter(user=username).exists() # ユーザー作成時に自動生成するようにすれば不要になる
+    current_time = timezone.now()
+
+    record = ActiveDevice.objects.filter(user=username).first()
+    mac_addr_list = set([addr.strip() for addr in record.device.split(",")])
 
     # process for connect association
-
-    if not is_first_time and request_status:
-
-        record = ActiveDevice.objects.filter(user=username)
-        mac_addr_list = set([addr.strip() for addr in record.device.split(",")])
+    if request_status:
 
         if not(set(request_device) <= mac_addr_list):
-
             mac_addr_list.add(request_device)
 
-        result_str = ",".join(mac_addr_list)
-        record.device = result_str
-        record.save()
-
-    # ユーザー作成時に自動生成するようにすれば不要になる
-    elif is_registerd and is_first_time and request_status :
-
-        record = ActiveDevice(user=username, device=request_device)
-        record.save()
-
-    elif not is_registerd and request_status:
-
-        account = User(username=username)
-        account.save()
+        if not mac_addr_list.__len__:
+            log = AttendanceLog(user=username, time_in=current_time)
+            log.save()
 
 
     # process for disconnection
-    elif not request_status and not is_first_time:
-
-        record = ActiveDevice.objects.filter(user=username)
-        mac_addr_list = set([addr.strip() for addr in record.device.split(",")])
+    elif not request_status:
 
         if (set(request_device) <= mac_addr_list):
-
             mac_addr_list.remove(request_device)
 
-        result_str = ",".join(mac_addr_list)
-        record.device = result_str
-        record.save()
-'''
+        if not mac_addr_list.__len__:
+            log = AttendanceLog.objects.filter(user=username).latest('time_in')
+            log.time_out = current_time
+            log.save()
+
+    result_str = ",".join(mac_addr_list)
+    record.device = result_str
+    record.save()
