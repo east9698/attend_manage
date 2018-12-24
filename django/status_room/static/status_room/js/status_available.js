@@ -15,7 +15,7 @@ $(function(){
     };
     //console.log(JSON.stringify(data));
     $.ajax({
-      url: "status_change/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
+      url: "browser/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
       method: "POST",
       data: request_data, // 連想配列をJSONに変換しなくて良い見たい・・・
       cache: false
@@ -31,9 +31,9 @@ $(function(){
     })
     .done(function(responce, textStatus, jqXHR){
 
-      if (responce['status'] === true) {
+      if (responce['status_proc'] === true) {
 
-        alert(responce['smg']+` (status = ${jqXHR.status})`); // for debug
+        alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
         
         console.log(responce);
         $("#enter").prop('disabled', true);
@@ -42,17 +42,17 @@ $(function(){
       	//alert("kkkkkkNNNNNN");
         $("#available_users_list .result").trigger("click");
 
-        return(0);
+        //return(0);
 
-      } else if (responce['status'] === false) {
+      } else if (responce['status_proc'] === true) {
 
-        alert(responce['smg']+` (status = ${jqXHR.status})`);
-        return(0);
+        alert(responce['msg']+` (status = ${jqXHR.status})`);
+        //return(0);
 
       } else {
 
         alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
-        return(1);
+        //return(1);
 
       }
     })
@@ -77,20 +77,14 @@ $(function(){
       "status": status
     };
     $.ajax({
-      url: "status_change/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
+      url: "browser/",　// なぜか{% url 'status_change' %}とすると、404になってしまう。。。
       method: "POST",
       data: request_data // 連想配列をJSONに変換しなくて良い見たい・・・
     })
     .done(function(responce, textStatus, jqXHR){
 
-      if (responce['error'] === "not_changed") {
-        alert(`既に退室しています。 (status = ${jqXHR.status})`);
-        //return(0);
-      } else if ('error' in responce) {
-        alert("no one in room");
-        $(innner_table).empty();
+      if(responce['status_proc'] === true) {
 
-      } else {
         console.log(responce);
         //alert(`正常に処理しました。(status = ${jqXHR.status})`);
         $("#enter").prop('disabled', false);
@@ -98,10 +92,22 @@ $(function(){
         $("#status").html("未入室");
         //alert("更新するよ！");
         $("#available_users_list .result").trigger('click');
-      }
+
+      } else if (responce['status_proc'] === false) {
+
+        alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
+
+      } else {
+
+        alert("unknown error occured");
+        $(innner_table).empty();
+
+      } 
     })
     .fail(function(jqXHR, textStatus, errorThrown){
+
       alert(`通信エラーが発生しました。(status = ${jqXHR.status})\nもう一度試すか、管理者にご連絡ください。`);
+
     });
   });
 

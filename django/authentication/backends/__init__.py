@@ -1,1 +1,1 @@
-from authentication.backends.radius import RADIUSBackend, RADIUSRealmBackend
+from .radius import RADIUSBackend, RADIUSRealmBackend

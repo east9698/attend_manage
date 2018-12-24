@@ -24,16 +24,10 @@ $(function(){
     })
     .done(function(responce, textStatus, jqXHR){
       var innner_table = "#available_users_list > table > tbody";
+      console.log(responce)
+      if (responce['status_proc'] === true && responce[`available_users`]) {
 
-      if ('error' in responce) {
-
-        //alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
-        $(innner_table).empty();
-        //return(0);
-
-      } else {
-
-
+        alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
         //alert(`正常に処理しました。(status = ${jqXHR.status})`);
 
         console.log(responce.available_users[0].username);
@@ -45,6 +39,16 @@ $(function(){
           var time_in = responce.available_users[i].time_in;
           $(innner_table).html($(innner_table).html() + "<tr>\n<th>" + username + "</th>\n<td>" + time_in + "</td>\n</tr>");
         }
+
+      } else if (responce['status_proc'] === true && !(responce[`available_users`])) {
+
+        alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
+
+        //alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+        $(innner_table).empty();
+        //return(0);
+      } else if (responce['status_proc'] === false) {
+        alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
       }
     })
     .fail(function(jqXHR, textStatus, errorThrown){

@@ -1,16 +1,19 @@
 from django.shortcuts import render
 
 # Create your views here.
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.shortcuts import get_current_site
 from django.views import generic
-from .forms import LoginForm
+from .forms import *
+#from django.utils import timezone
+
 
 class Login(LoginView):
     """ログインページ"""
-    form_class = LoginForm
+    form_class = AuthenticationForm
     template_name = 'auth/login.html'
 
     def get_context_data(self, **kwargs):
@@ -26,19 +29,20 @@ class Login(LoginView):
         return context
 
 
-
+'''
 class Logout(LoginRequiredMixin, LogoutView):
     """ログアウトページ"""
-    template_name = 'auth/logout.html'
+    template_name = 'auth/login.html'
+'''
 
-
+'''
 @csrf_exempt
 def radius(request):
 
     request_data = request.POST
     print(request_data)
     user_id = request.user.id
-    current_time = datetime.now().isoformat()
+    current_time = timezone.now()
 
     def is_available():
         return AttendanceLog.objects.filter(user=user_id).exists()
@@ -56,15 +60,14 @@ def radius(request):
         from ..console.models import AttendanceLog
         log = AttendanceLog(user_id=user_id, time_in=current_time)
         log.save()
-    '''
-        # ログイン経験がなく、Djangoのシステムにアカウントが存在しない場合
-        elif is_available() is False:
+    # ログイン経験がなく、Djangoのシステムにアカウントが存在しない場合
+    elif is_available() is False:
 
-            user =
-            log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
-            log.time_out = current_time
-            log.save()
+        user =
+        log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
+        log.time_out = current_time
+        log.save()
 
-    '''
 
     return 0
+'''

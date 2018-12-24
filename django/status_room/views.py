@@ -1,16 +1,18 @@
 from django.shortcuts import render
+
+# Create your views here.
+
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile, AttendanceLog, ActiveDevice
+from .models import AttendanceLog, ActiveDevice
 from authentication.models import User
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
-#from django.core.exceptions import ObjectDoesNotExist # for exception processing
-
-# Create your views here.
+from django.contrib.auth import get_user_model
+from distutils.util import strtobool
 
 # translate to japanese format for time objects
 def date_fmt_ja(obj):
@@ -23,9 +25,9 @@ def date_fmt_ja(obj):
 
 @login_required
 def index(request):
-
-    user_id = request.user.id
-    user_prof = UserProfile.objects.filter(user=user_id).select_related('user').get()
+    usermodel = get_user_model()
+    user = request.user.username
+    user_prof = usermodel.objects.filter(username=user).get()
     print(user_prof)
     is_in_room = False
     time_enter = None
@@ -33,12 +35,12 @@ def index(request):
 
 
     # 自分のステータスが在室中かどうかの確認処理
-    if AttendanceLog.objects.filter(user=user_id).exists(): # 自分のレコードが存在するか
+    if AttendanceLog.objects.filter(user=user).exists(): # 自分のレコードが存在するか
 
-        if AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists(): # 最も新しいレコードを取得
+        if AttendanceLog.objects.filter(user=user, time_in__isnull=False, time_out__isnull=True).exists(): # 最も新しいレコードを取得
 
             is_in_room = True # つまり在室
-            time_enter = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).select_related('user').latest('time_in')
+            time_enter = AttendanceLog.objects.filter(user=user, time_in__isnull=False, time_out__isnull=True).select_related('user').latest('time_in')
 
         # 過去のレコードが存在しない場合は在室していないので初期値(is_in_room=False)のままクライアントに渡す
 
@@ -52,66 +54,72 @@ def index(request):
 
             for i in range(query.count()):
                 time_in = date_fmt_ja(query[i].time_in)
-                available_users.append({'username': query[i].user.name_ja, 'time_in': time_in})
+                available_users.append({'username': query[i].user.get_full_name(), 'time_in': time_in})
 
         # 誰もいない場合は初期値(available_users=None)のままクライアントに返す
 
     # クライアント側に返すデータ
     params = {
         'title': 'ホーム',
-        'username': user_prof.name_ja, # ユーザーの日本語名を代入
+        'username': user_prof.username, # ユーザーの日本語名を代入
         'my_stat': is_in_room, # DB上の在室状況
         'time_in': time_enter,
         'all_stat': available_users,
     }
 
-    return render(request, 'console/index.html', params)
+    return render(request, 'status_room/index.html', params)
 
 
 @csrf_exempt
 def request_from_browser(request):
     
+    usermodel = get_user_model()
     request_data = request.POST
-    status_room = request_data.status
-    user_id = request.user.id
+    status_room = bool(strtobool(request_data['status']))
+    print(status_room)
+    user = request.user.username
+    userobj = usermodel.objects.filter(username=user).first()
 
-    result = status_change(user_id, status_room)
+    result = status_change(userobj, status_room)
 
     return JsonResponse(result)
-
+'''
 @csrf_exempt
 def request_from_log(request):
 
+    usermodel = get_user_model()
     request_data = request.POST
     request_device = request_data.mac_addr
     status_connect = request_data.status # this variable should take a value either "connect", "disconnect" gior "outrange"
     username = request_data.user
 
-    if UserProfile.objects.filter(user=username).exists():
-        user_id = UserProfile.objects.filter(user=username).get(id)
+    if usermodel.objects.filter(user=username).exists():
+        user_id = usermodel.objects.filter(user=username).get(id)
     
     else:
         pass # create new user on Django App
 
     status_change(user_id, status_connect)
     register_device(user_id, status_connect)
+'''
 
-def status_change(user_id, request_status): # user_id must be "int" type value, and request_status should be "bool" type value(True->Entering, False->Leaving)
+def status_change(username, request_status): # user_id must be "int" type value, and request_status should be "bool" type value(True->Entering, False->Leaving)
 
     current_time = timezone.now()
-    is_in_room = AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
+    is_in_room = AttendanceLog.objects.filter(user=username, time_in__isnull=False, time_out__isnull=True).exists() # この関数が使われるのは
 
     if request_status and not is_in_room: # Entering the room
-        log = AttendanceLog(user_id=user_id, time_in=current_time)
+        log = AttendanceLog(user=username, time_in=current_time)
         log.save()
 
     elif not request_status and is_in_room: # Leaving the room
-        log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
+        log = AttendanceLog.objects.filter(user=username).latest('time_in')
         log.time_out = current_time
         log.save()
 
     
     else: # Return error message
+        
         responce_data = {
             'status_proc': False, # False means process status is failed 
             'msg': 'The room status have not changed!',
@@ -125,7 +133,6 @@ def status_change(user_id, request_status): # user_id must be "int" type value, 
         'msg': 'The room status have successfully changed!'
     }
     return responce_data
-
 
 @csrf_exempt
 def status_all(request):
@@ -142,35 +149,40 @@ def status_all(request):
 
         for i in range(query.count()):
             time_in = date_fmt_ja(query[i].time_in)
-            available_users.append({'username': query[i].user.name_ja, 'time_in': time_in})
+            available_users.append({'username': query[i].user.username, 'time_in': time_in})
 
 
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
     else:
         responce_data = {
-            'error': 'no record',
+            'status_proc': True,
+            'available_users': None,
+            'msg': 'There are no available users.',
         }
         return JsonResponse(responce_data)
 
 
     # 問題ない場合はリクエストされた値をDBに代入しその値を返す
     responce_data = {
+        'status_proc': True,
         'available_users': available_users,
+        'msg': 'success',
     }
     print(responce_data)
     return JsonResponse(responce_data)
 
+'''
+def register_device(username, request_status, request_device):
 
-def register_device(user_id, request_status, request_device):
-
-    is_registerd = UserProfile.objects.filter(user=user_id).exists()
-    is_first_time = ActiveDevice.objects.filter(user=user_id).exists() # ユーザー作成時に自動生成するようにすれば不要になる
+    usermodel = get_user_model()
+    is_registerd = usermodel.objects.filter(user=username).exists()
+    is_first_time = ActiveDevice.objects.filter(user=username).exists() # ユーザー作成時に自動生成するようにすれば不要になる
 
     # process for connect association
 
     if not is_first_time and request_status:
 
-        record = ActiveDevice.objects.filter(user=user_id)
+        record = ActiveDevice.objects.filter(user=username)
         mac_addr_list = set([addr.strip() for addr in record.device.split(",")])
 
         if not(set(request_device) <= mac_addr_list):
@@ -184,19 +196,19 @@ def register_device(user_id, request_status, request_device):
     # ユーザー作成時に自動生成するようにすれば不要になる
     elif is_registerd and is_first_time and request_status :
 
-        record = ActiveDevice(user=user_id, device=request_device)
+        record = ActiveDevice(user=username, device=request_device)
         record.save()
 
     elif not is_registerd and request_status:
 
-        account = User(username=user_id)
+        account = User(username=username)
         account.save()
 
 
     # process for disconnection
     elif not request_status and not is_first_time:
 
-        record = ActiveDevice.objects.filter(user=user_id)
+        record = ActiveDevice.objects.filter(user=username)
         mac_addr_list = set([addr.strip() for addr in record.device.split(",")])
 
         if (set(request_device) <= mac_addr_list):
@@ -206,3 +218,4 @@ def register_device(user_id, request_status, request_device):
         result_str = ",".join(mac_addr_list)
         record.device = result_str
         record.save()
+'''

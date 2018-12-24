@@ -1,4 +1,4 @@
-{% extends "auth/base.html" %}
+{% extends "status_room/base.html" %}
 {%load static%}
 {% block contents %}
 <form action="" method="POST">
@@ -17,12 +17,4 @@
     </div>
   </div>
 </form>
-<!--
-<form class="form text-center my-5" method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="btn btn-primary"type="submit">ログイン</button>
-</form>
-<p> <a href="/admin">管理コンソール</a></p>
 {% endblock %}
--->
