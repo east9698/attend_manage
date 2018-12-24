@@ -131,10 +131,10 @@ flycheck_*.el
 ### https://raw.github.com/github/gitignore/d1baec1bf1fe04bbc67b9e23074ea2f00fd31224/Global/VisualStudioCode.gitignore
 
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+#!.vscode/settings.json
+#!.vscode/tasks.json
+#!.vscode/launch.json
+#!.vscode/extensions.json
 
 
 ### https://raw.github.com/github/gitignore/d1baec1bf1fe04bbc67b9e23074ea2f00fd31224/Python.gitignore
