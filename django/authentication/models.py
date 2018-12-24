@@ -97,7 +97,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
 
-    def get_full_name(self):
+    def get_name_ja(self):
         """
         Return the first_name plus the last_name, with a space in between.
         """

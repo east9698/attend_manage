@@ -53,14 +53,14 @@ def index(request):
 
             for i in range(query.count()):
                 time_in = date_fmt_ja(query[i].time_in)
-                available_users.append({'username': query[i].user.get_full_name(), 'time_in': time_in})
+                available_users.append({'username': query[i].user.get_name_ja(), 'time_in': time_in})
 
         # 誰もいない場合は初期値(available_users=None)のままクライアントに返す
 
     # クライアント側に返すデータ
     params = {
         'title': 'ホーム',
-        'username': user_prof.username, # ユーザーの日本語名を代入
+        'username': user_prof.get_name_ja(), # ユーザーの日本語名を代入
         'my_stat': is_in_room, # DB上の在室状況
         'time_in': time_enter,
         'all_stat': available_users,
@@ -153,7 +153,7 @@ def status_all(request):
 
         for i in range(query.count()):
             time_in = date_fmt_ja(query[i].time_in)
-            available_users.append({'username': query[i].user.username, 'time_in': time_in})
+            available_users.append({'username': query[i].user.get_name_ja(), 'time_in': time_in})
 
 
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
