@@ -91,7 +91,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-        #abstract = True
+        # abstract = True
 
     def clean(self):
         super().clean()
@@ -104,7 +104,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         full_name = '%s %s' % (self.last_name_ja, self.first_name_ja)
         return full_name.strip()
 
-    def get_name_en(self):
+    def get_full_name(self):
         """Return the short name for the user."""
         full_name = '%s %s' % (self.first_name_en, self.last_name_en)
         return full_name.strip()

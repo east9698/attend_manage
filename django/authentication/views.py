@@ -1,14 +1,11 @@
-from django.shortcuts import render
-
-# Create your views here.
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import resolve_url  # , render
+#from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView # , LogoutView
+#from django.views.decorators.csrf import csrf_exempt
 from django.contrib.sites.shortcuts import get_current_site
 from django.views import generic
 from .forms import *
-#from django.utils import timezone
+
 
 
 class Login(LoginView):
@@ -28,46 +25,16 @@ class Login(LoginView):
         })
         return context
 
+class UserUpdateView(generic.edit.UpdateView):
+    model = get_user_model()
+    form_class = UserChangeForm
+    template_name = 'update.html'
+
+    def get_success_url(self):
+        return resolve_url('room:index', pk=self.kwargs['pk'])
 
 '''
 class Logout(LoginRequiredMixin, LogoutView):
     """ログアウトページ"""
     template_name = 'auth/login.html'
-'''
-
-'''
-@csrf_exempt
-def radius(request):
-
-    request_data = request.POST
-    print(request_data)
-    user_id = request.user.id
-    current_time = timezone.now()
-
-    def is_available():
-        return AttendanceLog.objects.filter(user=user_id).exists()
-
-    def is_in_room():
-        return AttendanceLog.objects.filter(user=user_id, time_in__isnull=False, time_out__isnull=True).exists()
-
-
-    # ログイン経験があり、入室状態の場合
-    if is_available() is True and is_in_room() is True:
-        pass
-
-    # ログイン経験はあるが、未入室状態の場合
-    elif is_available() is True and is_in_room() is False:
-        from ..console.models import AttendanceLog
-        log = AttendanceLog(user_id=user_id, time_in=current_time)
-        log.save()
-    # ログイン経験がなく、Djangoのシステムにアカウントが存在しない場合
-    elif is_available() is False:
-
-        user =
-        log = AttendanceLog.objects.filter(user=user_id).latest('time_in')
-        log.time_out = current_time
-        log.save()
-
-
-    return 0
 '''

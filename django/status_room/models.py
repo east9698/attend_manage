@@ -30,4 +30,4 @@ class ActiveDevice(models.Model):
     device = models.TextField(name="mac_addr")
 
     def __str__(self):
-        return '%s(%s): %s' % (self.user.get_full_name(), self.user.username, self.device)
+        return '%s(%s): %s' % (self.user.get_full_name(), self.user.username, self.mac_addr)
