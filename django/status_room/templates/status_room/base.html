@@ -21,32 +21,32 @@
   <body>
     <header>
       <div class="container-fluid">
-        <div class="row justify-content-between my-1">
+        <div class="row justify-content-between my-1 py-1">
           <div class="col-sm-7 col-md-6 col-lg-5">
             <span id="title">曽研究室利用管理システム</span>
           </div>
-          <div class="col-sm-4 col-md-4 col-lg-3 text-right mt-2">
+          <div class="col-sm-4 col-md-4 col-lg-3 text-right">
             <span id="username">{{username}}</span>
-            <a href="{% url 'auth:logout' %}" class=""><button type="button" class="btn btn-primary btn-sm my-1">ログアウト</button></a>
+            <a href="{% url 'auth:logout' %}" class=""><button type="button" class="btn btn-primary btn-sm my-1"><img src="{% static 'status_room/img/lock.png' %}" alt="lock" height="30px"> ログアウト</button></a>
           </div>
         </div>
       </div>
     </header>
       <nav class="my-5">
         {% if my_stat is True %}
-        <p class="text-center text-bold" id="status">入室済み</p>
+        <p class="text-center text-bold" id="status"><img src="{% static 'status_room/img/in-room.png' %}" alt="in-room" height="50px"> 入室済み</p>
         <div class="text-center">
           <div class="btn-group" role="group">
-            <button type="submit" class="btn btn-md btn-success" name="enter" id="enter" disabled>在室登録</button>
-            <button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit">退室処理</button>
+            <button type="submit" class="btn btn-md btn-success" name="enter" id="enter" disabled><img src="{% static 'status_room/img/enter.png' %}" alt="in-room" height="30px"> 在室登録</button>
+            <button type="submit" class="btn btn-md btn-danger" name="exit"  id="exit"><img src="{% static 'status_room/img/leaving.png' %}" alt="in-room" height="30px"> 退室処理</button>
           </div>
         </div>
         {% elif my_stat is False %}
-        <p class="text-center text-bold" id="status">未入室</p>
+        <p class="text-center text-bold" id="status"><img src="{% static 'status_room/img/not-in-room.png' %}" alt="not-in-room" height="50px">未入室</p>
         <div class="text-center">
           <div class="btn-group mx-auto" role="group">
-            <button type="submit" class="btn btn-md btn-success" name="enter" id="enter">在室登録</button>
-            <button type="submit" class="btn btn-md btn-danger" name="exit" id="exit" disabled>退室処理</button>
+            <button type="submit" class="btn btn-md btn-success" name="enter" id="enter"><img src="{% static 'status_room/img/enter.png' %}" alt="enter" height="30px"> 在室登録</button>
+            <button type="submit" class="btn btn-md btn-danger" name="exit" id="exit" disabled><img src="{% static 'status_room/img/leaving.png' %}" alt="leaving" height="30px"> 退室処理</button>
           </div>
         </div>
         {% else %}

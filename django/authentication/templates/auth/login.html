@@ -5,13 +5,13 @@
   <div class="col-sm-8 col-md-6 col-lg-4 offset-sm-2 offset-md-3 offset-lg-4 mt-5">
     <div class="card">
       <div class="card-body">
-        {{ form.non_field_errors }}
+        {# {{ form.non_field_errors }} #}
         {% for field in form %}
           {{ field }}
-          {{ field.errors }}
+          {# {{ field.errors }} #}
           <hr>
         {% endfor %}
-        <button type="submit" class="btn btn-success btn-lg btn-block">ログイン</button>
+        <button type="submit" class="btn btn-success btn-lg btn-block"><img src="{% static 'status_room/img/key.png' %}" alt="key" height="40px"> ログイン</button>
         {% csrf_token %}
       </div>
     </div>
