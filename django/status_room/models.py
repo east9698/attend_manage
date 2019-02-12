@@ -15,7 +15,11 @@ class AttendanceLog(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT) # このテーブル上のレコードが削除されても参照先のテーブルからユーザ情報を削除しない
     time_in = models.DateTimeField(null=True, blank=True)
     time_out = models.DateTimeField(null=True, blank=True)
-
+    '''
+    def get_duration():
+        timediff = self.time_out - self.time_in
+        return timediff.hours
+    '''
     def __str__(self):
         from .views import date_fmt_ja
         if self.time_out:

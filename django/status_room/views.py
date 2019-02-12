@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from distutils.util import strtobool
 from authentication.forms import *
-
+#from django.db.models import DurationField, ExpressionWrapper, F
 
 # translate into japanese format for time objects
 def date_fmt_ja(obj):
@@ -31,7 +31,7 @@ def index(request):
     time_enter = None
     available_users = []
 
-    print(user_prof.is_active)
+    print(user_prof.username)
 
     # if not user_prof.is_active():
     #     pass
@@ -58,19 +58,23 @@ def index(request):
 
             for i in range(query.count()):
                 time_in = date_fmt_ja(query[i].time_in)
-                available_users.append({'username': query[i].user.get_name_ja(), 'time_in': time_in})
+                available_users.append({
+                    'username': query[i].user.get_name_ja() if query[i].user.get_name_ja() else query[i].user.username,
+                    'time_in': time_in,
+                    })
 
         # 誰もいない場合は初期値(available_users=None)のままクライアントに返す
 
     # クライアント側に返すデータ
     params = {
         'title': 'ホーム',
-        'username': user_prof.get_name_ja(), # ユーザーの日本語名を代入
+        'username': user_prof.get_name_ja() if user_prof.get_name_ja() else user_prof.username, # ユーザーの日本語名を代入（未登録の場合はユーザーネームを）
         'my_stat': is_in_room, # DB上の在室状況
         'time_in': time_enter,
         'all_stat': available_users,
     }
-
+    #diff = AttendanceLog.objects.annotate(duration=ExpressionWrapper(F('time_out') - F('time_in'), output_field=DurationField())) # for debug
+    #print(diff.all())
     return render(request, 'status_room/index.html', params)
 
 
@@ -83,9 +87,9 @@ def request_from_browser(request):
     
     usermodel = get_user_model()
     request_data = request.POST
-    print(request)
+    print(request) # for debug
     status_room = bool(strtobool(request_data['status']))
-    print(status_room)
+    print(status_room) # for debug
     user = request.user.username
     userobj = usermodel.objects.filter(username=user).first()
 
@@ -93,6 +97,15 @@ def request_from_browser(request):
 
     return JsonResponse(result)
 
+'''
+def get_staying_time():
+    #User = get_user_model
+    #amount_of_user = User.objects.all(user).count()
+    #print(amount_of_user)
+    query = AttendanceLog.objects.annotate(duration=ExpressionWrapper(F('time_out') - F('time_in'), output_field=DurationField()))
+    #query = AttendanceLog.objects.filter(user=user, time_in__isnull=False, time_out__isnull=False).select_related('user').all()
+    print(query)
+'''
 
 @csrf_exempt
 def request_from_log(request):
@@ -116,18 +129,14 @@ def request_from_log(request):
             # userobj = usermodel.objects.filter(username=user).get()
             device = ActiveDevice(user=userobj, mac_addr="")
             device.save()
-            print("User Added!!")
         if status_connect:
             register_device(user, request_device)
-            print("Registered")
     except KeyError:
         if not status_connect: unregister_device(request_device)
-        print("Unregistered")
 
     return HttpResponse()
 
 def register_device(username, request_device):  # process for connect association
-    print("enter register")
     usermodel = get_user_model()
     record = ActiveDevice.objects.filter(user=username).get()
 
@@ -138,9 +147,7 @@ def register_device(username, request_device):  # process for connect associatio
     if not(set(request_device) <= mac_addr_list):
         mac_addr_list.add(request_device)
         record.mac_addr = ",".join(map(str, mac_addr_list))
-        print(mac_addr_list)
         record.save()
-        print("saved")
 
     userobj = usermodel.objects.filter(username=record.user.username).get()
     status_change(userobj, True)
@@ -149,7 +156,6 @@ def register_device(username, request_device):  # process for connect associatio
 def unregister_device(request_device): # process for disconnection
 
     usermodel = get_user_model()
-    print(request_device)
 
     if ActiveDevice.objects.filter(mac_addr__icontains=request_device).exists():
 
@@ -157,15 +163,11 @@ def unregister_device(request_device): # process for disconnection
         mac_addr_list = {addr.strip() for addr in record.mac_addr.split(",")}  # convert str to set(dict)
         mac_addr_list = set(filter(lambda x:x != "", mac_addr_list))  # remove empty element
 
-        print("Get MAC address list")
  
         if not(set(request_device) <= mac_addr_list):
             mac_addr_list.remove(request_device)
-            print("Request Device Removed")
             record.mac_addr = ",".join(map(str, mac_addr_list))
-            print(str(mac_addr_list))
             record.save()
-            print("saved")
  
         if not mac_addr_list:
             userobj = usermodel.objects.filter(username=record.user.username).get()
@@ -239,5 +241,5 @@ def status_all(request):
         'available_users': available_users,
         'msg': 'success',
     }
-    print(responce_data)
+    print(responce_data
     return JsonResponse(responce_data)
