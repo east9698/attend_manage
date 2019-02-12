@@ -241,5 +241,5 @@ def status_all(request):
         'available_users': available_users,
         'msg': 'success',
     }
-    print(responce_data
+    print(responce_data)
     return JsonResponse(responce_data)
