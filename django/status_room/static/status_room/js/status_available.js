@@ -33,8 +33,8 @@ $(function(){
 
       if (responce['status_proc'] === true) {
 
-        alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
-        
+        //alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
+
         console.log(responce);
         $("#enter").prop('disabled', true);
         $("#exit").prop('disabled', false);
@@ -46,12 +46,12 @@ $(function(){
 
       } else if (responce['status_proc'] === true) {
 
-        alert(responce['msg']+` (status = ${jqXHR.status})`);
+        //alert(responce['msg']+` (status = ${jqXHR.status})`);
         //return(0);
 
       } else {
 
-        alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
+        //alert("サーバ上で予期せぬエラーが発生しました。\nもう一度試すか、管理者にご連絡ください。");
         //return(1);
 
       }
@@ -95,14 +95,14 @@ $(function(){
 
       } else if (responce['status_proc'] === false) {
 
-        alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
+        //alert(responce['msg']+` (status = ${jqXHR.status})`); // for debug
 
       } else {
 
         alert("unknown error occured");
         $(innner_table).empty();
 
-      } 
+      }
     })
     .fail(function(jqXHR, textStatus, errorThrown){
 
