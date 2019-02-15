@@ -12,7 +12,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True}))
+    username = UsernameField(label=_("User"),widget=forms.TextInput(attrs={'autofocus': True}))
     password = forms.CharField(
         label=_("Password"),
         strip=False,
@@ -177,7 +177,7 @@ class UserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial.get('password')
-        
+
 
 class PasswordChangeForm(BasePasswordChangeForm):
 
