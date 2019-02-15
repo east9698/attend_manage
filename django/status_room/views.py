@@ -217,13 +217,25 @@ def status_all(request):
     if AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).exists():
 
         query = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True).select_related('user') # 現在の在室者一覧を取得
-
-        for i in range(query.count()):
+        print(query.count())
+        print(query)
+        print(query.count())
+        """
+        for i in list(range(query.count())):
+            print("{0}-{1}".format(i, query[i].user.username))
+           
             time_in = date_fmt_ja(query[i].time_in)
-            if query[i].user.get_name_ja():
-                available_users.append({'username': query[i].user.get_name_ja(), 'time_in': time_in})
+        """
+        print([q for q in query])
+        for q in query:
+            print("---{0}".format(q.user.username))
+
+            time_in = date_fmt_ja(q.time_in)
+            
+            if q.user.get_name_ja():
+                available_users.append({'username': q.user.get_name_ja(), 'time_in': time_in})
             else:
-                available_users.append({'username': query[i].user.username, 'time_in': time_in})
+                available_users.append({'username': q.user.username, 'time_in': time_in})
 
     # DB上の在室状況とリクエストの値が同じ場合エラーを返す
     else:
