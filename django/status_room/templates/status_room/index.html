@@ -9,11 +9,21 @@
 
 <section id="available_users_list">
   <table class="table table-borderd">
-    <caption><img src="{% static 'status_room/img/people.png'%}" height="30px"> 在室者一覧<i class="fas fa-sync-alt ml-3 result"></i></caption>
+    <caption>
+      <img src="{% static 'status_room/img/people.png'%}" height="30px">
+      <span style="white-space:nowarp">在室者一覧</span>
+      <i class="fas fa-sync-alt ml-3 result"></i>
+    </caption>
     <thead>
       <tr>
-        <th><img src="{% static 'status_room/img/person.png'%}" height="30px"> 氏名</th>
-        <th><img src="{% static 'status_room/img/clock.png'%}" height="30px"> 入室時刻</th>
+        <th>
+          <img src="{% static 'status_room/img/person.png'%}" height="30px">
+          <span style="white-space:nowarp">氏名</span>
+        </th>
+        <th>
+          <img src="{% static 'status_room/img/clock.png'%}" height="30px">
+          <span style="white-space:nowarp">入室時刻</span>
+        </th>
       </tr>
     </thead>
     <tbody>
