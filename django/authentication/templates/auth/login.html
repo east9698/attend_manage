@@ -1,23 +1,53 @@
-{% extends "status_room/base.html" %}
 {%load static%}
-{% block contents %}
-<form action="" method="POST">
-  <div class="col-sm-8 col-md-6 col-lg-6 offset-sm-2 offset-md-3 offset-lg-3 mt-5">
-    <div class="card">
-      <div class="card-body">
-        {# {{ form.non_field_errors }} #}
-        {% for field in form %}
-          {{ field }}
-          {# {{ field.errors }} #}
-          <hr>
-        {% endfor %}
-        <button type="submit" class="btn btn-success btn-lg btn-block">
-          <img src="{% static 'status_room/img/key.png' %}" alt="key" height="30px">
-          <span style="white-space:nowarp">ログイン</span>
-        </button>
-        {% csrf_token %}
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <!-- disable caching with Ajax -->
+    <meta http-equiv='cache-control' content='no-store'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <title>{{title}}|曽研究室利用管理システム</title>
+    <link rel="shortcut icon" href="{% static 'status_room/img/fit_jc_banner.svg' %}">
+    <link rel="stylesheet" href="{% static 'status_room/css/base.css' %}">
+    {% block extra-css %}{% endblock %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'status_room/js/status_available.js' %}"></script>
+    <script type="text/javascript" src="{% static 'status_room/js/available_users.js' %}"></script>
+  </head>
+  <body>
+    <header>
+      <div class="container-fluid">
+        <div class="row justify-content-between my-1 py-1">
+          <div class="col-sm-7 col-md-6 col-lg-5">
+            <span id="title">曽研究室利用管理システム</span>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</form>
-{% endblock %}
+    </header>
+    <main>
+      <form action="" method="POST">
+        <div class="col-sm-8 col-md-6 col-lg-6 offset-sm-2 offset-md-3 offset-lg-3 mt-5">
+          <div class="card">
+            <div class="card-body">
+              {# {{ form.non_field_errors }} #}
+              {% for field in form %}
+                {{ field }}
+                {# {{ field.errors }} #}
+                <hr>
+              {% endfor %}
+              <button type="submit" class="btn btn-success btn-lg btn-block">
+                <img src="{% static 'status_room/img/key.png' %}" alt="key" height="30px">
+                <span style="white-space:nowarp">ログイン</span>
+              </button>
+              {% csrf_token %}
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>

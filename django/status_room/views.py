@@ -56,12 +56,12 @@ def index(request):
             query = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=True)\
                     .select_related('user').all() # 現在の在室者一覧を取得
 
-            for i in range(query.count()):
-                time_in = date_fmt_ja(query[i].time_in)
+            for q in query:
+                time_in = date_fmt_ja(q.time_in)
                 available_users.append({
-                    'username': query[i].user.get_name_ja() if query[i].user.get_name_ja() else query[i].user.username,
+                    'username': q.user.get_name_ja() if q.user.get_name_ja() else q.user.username,
                     'time_in': time_in,
-                    })
+                })
 
         # 誰もいない場合は初期値(available_users=None)のままクライアントに返す
 
@@ -84,7 +84,7 @@ class UserCreationView():
 
 @csrf_exempt
 def request_from_browser(request):
-    
+
     usermodel = get_user_model()
     request_data = request.POST
     print(request) # for debug
@@ -115,7 +115,7 @@ def request_from_log(request):
     request_data = json.loads(request.body)
     request_device = request_data['mac_addr']
     status_connect = request_data['status']
-    
+
     try:
         user = request_data['username']
 
@@ -163,12 +163,12 @@ def unregister_device(request_device): # process for disconnection
         mac_addr_list = {addr.strip() for addr in record.mac_addr.split(",")}  # convert str to set(dict)
         mac_addr_list = set(filter(lambda x:x != "", mac_addr_list))  # remove empty element
 
- 
+
         if not(set(request_device) <= mac_addr_list):
             mac_addr_list.remove(request_device)
             record.mac_addr = ",".join(map(str, mac_addr_list))
             record.save()
- 
+
         if not mac_addr_list:
             userobj = usermodel.objects.filter(username=record.user.username).get()
             status_change(userobj, False)
@@ -189,9 +189,9 @@ def status_change(username, request_status): # request_status should be "bool" t
         log.save()
 
     else: # Return error message
-        
+
         responce_data = {
-            'status_proc': False, # False means process status is failed 
+            'status_proc': False, # False means process status is failed
             'msg': 'The room status have not changed!',
         }
         return responce_data
@@ -223,7 +223,7 @@ def status_all(request):
         """
         for i in list(range(query.count())):
             print("{0}-{1}".format(i, query[i].user.username))
-           
+
             time_in = date_fmt_ja(query[i].time_in)
         """
         print([q for q in query])
@@ -231,7 +231,7 @@ def status_all(request):
             print("---{0}".format(q.user.username))
 
             time_in = date_fmt_ja(q.time_in)
-            
+
             if q.user.get_name_ja():
                 available_users.append({'username': q.user.get_name_ja(), 'time_in': time_in})
             else:
