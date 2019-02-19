@@ -37,4 +37,34 @@
   </table>
 </section>
 
+<section id="dration_list">
+  <table class="table table-borderd">
+    <caption>
+      <span style="font-size:1.5em;"><i class="fas fa-clipboard-list"></i></span>
+      <span style="white-space:nowrap">累計在室時間</span>
+      <i class="fas fa-sync-alt ml-3 result"></i>
+    </caption>
+    <thead>
+      <tr>
+        <th>
+          <span style="font-size:1.75em;"><i class="fas fa-user"></i></span>
+          <span style="white-space:nowrap">氏名</span>
+        </th>
+        <th>
+          <span style="font-size:1.75em;"><i class="far fa-clock"></i></span>
+          <span style="white-space:nowrap">累計時間</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in duration_all %}
+      <tr>
+        <th>{{d.username}}</th>
+        <td>{{d.duration}}秒</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
 {% endblock %}

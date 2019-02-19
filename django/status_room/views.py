@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from distutils.util import strtobool
 from authentication.forms import *
-#from django.db.models import DurationField, ExpressionWrapper, F
+from django.db.models import DurationField, ExpressionWrapper, F, Sum
 
 # translate into japanese format for time objects
 def date_fmt_ja(obj):
@@ -30,7 +30,7 @@ def index(request):
     is_in_room = False
     time_enter = None
     available_users = []
-
+    durations = []
     print(user_prof.username)
 
     # if not user_prof.is_active():
@@ -65,6 +65,16 @@ def index(request):
 
         # 誰もいない場合は初期値(available_users=None)のままクライアントに返す
 
+        duration = AttendanceLog.objects.filter(time_in__isnull=False, time_out__isnull=False).values('user_id').annotate(duration=Sum(ExpressionWrapper(F('time_out') - F('time_in'), output_field=DurationField())))
+
+        for d in duration:
+            durations.append({
+                'username': d['user_id'],
+                'duration': int(d['duration'].total_seconds()),
+            })
+        #diff = AttendanceLog.objects.annotate(duration=ExpressionWrapper(F('time_out') - F('time_in'), output_field=DurationField())) # for debug
+        print(duration)
+
     # クライアント側に返すデータ
     params = {
         'title': 'ホーム',
@@ -72,9 +82,9 @@ def index(request):
         'my_stat': is_in_room, # DB上の在室状況
         'time_in': time_enter,
         'all_stat': available_users,
+        'duration_all': durations,
     }
-    #diff = AttendanceLog.objects.annotate(duration=ExpressionWrapper(F('time_out') - F('time_in'), output_field=DurationField())) # for debug
-    #print(diff.all())
+
     return render(request, 'status_room/index.html', params)
 
 
