@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'status_room',
     'authentication',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'global_conf.urls'
@@ -123,7 +125,7 @@ LOGIN_URL = '/auth/login/' # デフォルトでは/accounts/login/に飛ばさ�
 
 # RADIUS Authintication config
 
-RADIUS_SERVER = '192.168.100.13'
+RADIUS_SERVER = '150.43.75.174'
 
 RADIUS_PORT = 1812
 
@@ -149,3 +151,7 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
